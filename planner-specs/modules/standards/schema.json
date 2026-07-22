@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://planner.local/schemas/standards.schema.json",
+  "title": "Standards (data/standards.json)",
+  "type": "object",
+  "required": ["version", "updated", "author", "assetTypes", "cables", "chargerTypes", "materials", "rules"],
+  "properties": {
+    "version": { "type": "string" },
+    "updated": { "type": "string", "format": "date" },
+    "author": { "type": "string" },
+    "assetTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "code", "color"],
+        "properties": {
+          "name": { "type": "string" },
+          "code": { "type": "string" },
+          "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "defaultCable": { "type": ["string", "null"] },
+          "attributes": { "type": "object" }
+        }
+      }
+    },
+    "cables": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["category"],
+        "properties": {
+          "category": { "type": "string" },
+          "maxLength": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "chargerTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["powerKW", "defaultCable"],
+        "properties": {
+          "powerKW": { "type": "number" },
+          "defaultCable": { "type": "string" }
+        }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "unit"],
+        "properties": {
+          "name": { "type": "string" },
+          "unit": { "type": "string" }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "field", "op", "value", "severity", "message"],
+        "properties": {
+          "id": { "type": "string" },
+          "field": { "type": "string" },
+          "op": { "enum": [">", ">=", "<", "<=", "==", "!="] },
+          "value": {},
+          "severity": { "enum": ["warning", "error"] },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "_status": "ENTWURF -- wird beim Architect-Lauf fuer Modul 2 final geprueft"
+}

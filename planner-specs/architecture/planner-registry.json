@@ -1,0 +1,34 @@
+{
+  "registryVersion": "1.0",
+  "modules": [
+    {
+      "name": "Core",
+      "version": "1.0.0",
+      "dependencies": [],
+      "exports": ["EventBus", "eventBus", "ObjectRegistry", "registry", "DOM", "CORE_EVENTS", "MODULE_MANIFEST", "ProjectManager", "CURRENT_SCHEMA_VERSION", "Storage", "LocalStorageAdapter"],
+      "publicApi": [
+        "EventBus.on(eventName, handler)", "EventBus.off(eventName, handler)", "EventBus.emit(eventName, payload)",
+        "ObjectRegistry.register(key, value)", "ObjectRegistry.get(key)", "ObjectRegistry.has(key)", "ObjectRegistry.unregister(key)",
+        "DOM.get(id)", "DOM.query(selector, root)", "DOM.queryAll(selector, root)", "DOM.create(tagName, options)",
+        "ProjectManager.createNewProject(name)", "ProjectManager.loadProjectData(projectData)", "ProjectManager.getProject()",
+        "ProjectManager.generateId(prefix)", "ProjectManager.getCollection(name)", "ProjectManager.getFromCollection(name, id)",
+        "ProjectManager.addToCollection(name, item)", "ProjectManager.removeFromCollection(name, id)",
+        "ProjectManager.updateInCollection(name, id, patch)", "ProjectManager.getSetting(path)", "ProjectManager.setSetting(path, value)",
+        "ProjectManager.setStandardsVersion(version)", "ProjectManager.getStandardsVersion()", "ProjectManager.toJSON()",
+        "Storage.saveProject(projectData) [async]", "Storage.loadProject(id) [async]", "Storage.listProjects() [async]",
+        "Storage.deleteProject(id) [async]", "Storage.migrateProject(fromVersion, toVersion, projectData) [async]"
+      ],
+      "eventsPublished": ["core:project-created", "core:project-loaded", "core:project-saved", "core:project-changed", "core:app-ready"],
+      "eventsConsumed": [],
+      "schemaVersion": "1.0.0",
+      "compatibleWith": "Planner Architecture v1 (R1-R19)",
+      "files": [
+        "planner/index.html", "planner/css/main.css", "planner/js/core/EventBus.js", "planner/js/core/ObjectRegistry.js",
+        "planner/js/core/DOM.js", "planner/js/core/events.js", "planner/js/core/module-manifest.js",
+        "planner/js/core/ProjectManager.js", "planner/js/core/Storage.js", "planner/js/core/main.js"
+      ],
+      "hash": "n/a",
+      "builtAgainstCommit": "n/a (vor Einführung von ADR-009 gebaut)"
+    }
+  ]
+}

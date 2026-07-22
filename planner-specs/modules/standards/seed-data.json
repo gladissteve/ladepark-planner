@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-07-22",
+  "author": "gladissteve",
+  "assetTypes": {
+    "trafo": {
+      "name": "Trafostation (inkl. NSHV)",
+      "code": "TRAFO",
+      "color": "#e8871e",
+      "defaultCable": null
+    },
+    "hpc": {
+      "name": "HPC-Lader",
+      "code": "HPC",
+      "color": "#2f9e44",
+      "defaultCable": null
+    },
+    "camera": {
+      "name": "Kamera (PoE)",
+      "code": "CAM",
+      "color": "#1c7ed6",
+      "defaultCable": "cat6a"
+    },
+    "light": {
+      "name": "Mastleuchte",
+      "code": "LEU",
+      "color": "#c98a00",
+      "defaultCable": "nyy-j-5x2_5",
+      "attributes": { "notAus": false }
+    }
+  },
+  "cables": {
+    "cat6a": { "category": "Daten", "maxLength": 90 },
+    "nyy-j-5x2_5": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x16": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x25": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x35": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x50": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x70": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x95": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x120": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x150": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x185": { "category": "Energie", "maxLength": null },
+    "nyy-j-4x240": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-35-16": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-50-25": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-70-35": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-95-50": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-120-70": { "category": "Energie", "maxLength": null },
+    "nycwy-4konz-150-70": { "category": "Energie", "maxLength": null },
+    "n2xch-4x95": { "category": "Energie (Leistung)", "maxLength": null },
+    "n2xch-4x185": { "category": "Energie (Leistung)", "maxLength": null },
+    "n2xch-4x240": { "category": "Energie (Leistung)", "maxLength": null }
+  },
+  "chargerTypes": {
+    "abb-terra-184": { "powerKW": 180, "defaultCable": "n2xch-4x95" },
+    "alpitronic-hyc300": { "powerKW": 300, "defaultCable": "n2xch-4x185" },
+    "alpitronic-hyc400": { "powerKW": 400, "defaultCable": "n2xch-4x240" }
+  },
+  "materials": {},
+  "rules": [
+    {
+      "id": "cat6a-max-length",
+      "field": "cable.length",
+      "op": ">",
+      "value": 90,
+      "severity": "warning",
+      "message": "Cat6A länger als 90 m (PoE/Signal-Grenzwert)"
+    }
+  ]
+}

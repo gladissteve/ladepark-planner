@@ -1,0 +1,97 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-07-22",
+  "author": "TSG",
+  "assetTypes": {
+    "TRAFO": {
+      "code": "TRAFO",
+      "name": "Trafostation",
+      "color": "#e8871e",
+      "defaultCable": null,
+      "attributes": {}
+    },
+    "HPC": {
+      "code": "HPC",
+      "name": "HPC-Lader",
+      "color": "#2f9e44",
+      "defaultCable": null,
+      "attributes": {}
+    },
+    "CAM": {
+      "code": "CAM",
+      "name": "Kamera PoE",
+      "color": "#1c7ed6",
+      "defaultCable": "CAT6A",
+      "attributes": {}
+    },
+    "LEU": {
+      "code": "LEU",
+      "name": "Mastleuchte",
+      "color": "#c98a00",
+      "defaultCable": "NYYJ",
+      "defaultCrossSection": "5x2.5",
+      "attributes": {
+        "emergencyStop": false
+      }
+    }
+  },
+  "cables": {
+    "NYYJ": {
+      "code": "NYYJ",
+      "name": "NYY-J",
+      "category": "Energie",
+      "crossSections": [16, 25, 35, 50, 70, 95, 120, 150, 185, 240],
+      "maxLength": null,
+      "poe": false
+    },
+    "NYCWY": {
+      "code": "NYCWY",
+      "name": "NYCWY",
+      "category": "Energie",
+      "crossSections": ["35/16", "50/25", "70/35", "95/50", "120/70", "150/70"],
+      "maxLength": null,
+      "poe": false
+    },
+    "N2XCH": {
+      "code": "N2XCH",
+      "name": "N2XCH",
+      "category": "Energie",
+      "crossSections": [95, 185, 240],
+      "maxLength": null,
+      "poe": false
+    },
+    "CAT6A": {
+      "code": "CAT6A",
+      "name": "Cat6A",
+      "category": "Daten",
+      "crossSections": [],
+      "maxLength": 90,
+      "poe": true
+    }
+  },
+  "chargerTypes": {
+    "ABB_TERRA184": {
+      "code": "ABB_TERRA184",
+      "name": "ABB Terra 184",
+      "powerKw": 180,
+      "defaultCable": "N2XCH",
+      "defaultCrossSection": 95
+    },
+    "ALPITRONIC_HYC300": {
+      "code": "ALPITRONIC_HYC300",
+      "name": "Alpitronic HYC300",
+      "powerKw": 300,
+      "defaultCable": "N2XCH",
+      "defaultCrossSection": 185
+    },
+    "ALPITRONIC_HYC400": {
+      "code": "ALPITRONIC_HYC400",
+      "name": "Alpitronic HYC400",
+      "powerKw": 400,
+      "defaultCable": "N2XCH",
+      "defaultCrossSection": 240
+    }
+  },
+  "materials": {},
+  "rules": []
+}

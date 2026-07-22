@@ -3,4 +3,5 @@ export const MODULE_MANIFEST = [
   // neuen, eigenen Eintrag hinzu — niemals bestehende Einträge anderer
   // Module ändern, entfernen oder umsortieren:
   // { name: '<modulname>', entry: '<relativer Pfad zur eigenen main.js, von js/core/ aus>' }
+  { name: 'Standards', entry: '../standards/main.js' }
 ];

@@ -1,6 +1,6 @@
 # Planner Architecture v1.0
 
-## Regeln (R1–R15, verbindlich, unveränderlich außer durch explizite Absprache)
+## Regeln (R1–R16, verbindlich, unveränderlich außer durch explizite Absprache)
 
 R1  Datengetrieben: keine Anlagentypen/Kabeltypen/Zuordnungen/Regeln hart im Code, alles aus data/standards.json
 R2  Anlage strikt getrennt von Material; Material wird nur über Regeln abgeleitet, nie direkt zugewiesen
@@ -20,8 +20,13 @@ R15 Bounded Contexts: jedes Modul legt/ändert/löscht Dateien nur im eigenen Ve
     Core→js/core/*, Standards→js/standards/*+data/standards.json, Assets→js/assets/*,
     Kabel→js/cables/*, GIS→js/gis/*, Kabeleditor→js/cable-editor/*,
     Mengenermittlung→js/reporting/*, Export→js/export/*.
-    index.html/css/* gehören Core; andere Module dürfen dort nur eng begrenzt ergänzen
-    (z. B. genau eine <script>-Zeile), nie fremde Abschnitte ändern
+    index.html ist nach Core dauerhaft fix und wird nie wieder geändert; künftige
+    Module tragen sich ausschließlich als ein Eintrag in js/core/module-manifest.js
+    ein, nie in main.js oder index.html
+R16 Öffentliche Schnittstellen sind unabhängig vom Speicher-/Implementierungs-Backend:
+    Backend-Wechsel (z. B. Storage von localStorage auf Datei/API) dürfen die
+    öffentliche API eines Moduls nie ändern, nur die interne Umsetzung
+    (Adapter-Pattern: öffentliche Methode delegiert an austauschbaren internen Adapter)
 
 ## Rollentrennung
 
@@ -57,7 +62,7 @@ Builder darf nie die eigene Arbeit abnehmen.
 
 ## Build-Reihenfolge (ein Modul = ein neuer Chat)
 
-1. Core (ProjectManager, EventBus, ObjectRegistry, Storage)
+1. Core (ProjectManager, EventBus, ObjectRegistry, DOM, Storage, ModuleLoader)
 2. Standards
 3. Asset-System
 4. Kabelsystem

@@ -6,6 +6,20 @@ export const CURRENT_SCHEMA_VERSION = '1.0.0';
 const COLLECTION_NAMES = ['assets', 'cables', 'routes', 'materials', 'layers'];
 const PREFIX_PATTERN = /^[a-z]{2,20}$/;
 
+function randomUUID() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback für unsicheren Kontext (z. B. Tests über reines HTTP auf
+  // einer IP-Adresse ohne TLS) — weiterhin ausschließlich
+  // Browser-Standard-API, kein externes Paket (R10).
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0'));
+  return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10, 16).join('')}`;
+}
+
 class ProjectManager {
   #project = null;
 
@@ -110,7 +124,7 @@ class ProjectManager {
         `Erhalten: ${JSON.stringify(prefix)}`
       );
     }
-    return `${prefix}-${crypto.randomUUID()}`;
+    return `${prefix}-${randomUUID()}`;
   }
 
   getCollection(name) {

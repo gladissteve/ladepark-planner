@@ -1,6 +1,6 @@
 # Planner Architecture v1.0
 
-## Regeln (R1–R16, verbindlich, unveränderlich außer durch explizite Absprache)
+## Regeln (R1–R17, verbindlich, unveränderlich außer durch explizite Absprache)
 
 R1  Datengetrieben: keine Anlagentypen/Kabeltypen/Zuordnungen/Regeln hart im Code, alles aus data/standards.json
 R2  Anlage strikt getrennt von Material; Material wird nur über Regeln abgeleitet, nie direkt zugewiesen
@@ -14,19 +14,27 @@ R9  Module greifen nie direkt auf interne Datenstrukturen anderer Module zu, nur
 R10 Keine externen Bibliotheken außer ausdrücklich vorgesehenen (z. B. Leaflet); sonst ausschließlich Browser-Standard-APIs
 R11 Sprachlevel fix für alle Module: ES2023, native ES-Module, strict mode
 R12 Jedes Modul, das Projektdaten persistiert, hält eine schemaVersion und bietet migrateProject(fromVersion, toVersion) an; Migrationslogik wird erst geschrieben, sobald eine neue Version tatsächlich existiert
-R13 Module kommunizieren nur über einen zentralen EventBus (emit/on), nie über direkte Aufrufe fremder Module; Event-Namen sind zentrale Konstanten, keine verstreuten String-Literale
-R14 Keine geratenen IDs/Direktzugriffe (kein document.getElementById, kein project.assets[0], kein verstreuter Typ-Stringvergleich); Zugriff nur über definierte Getter (z. B. AssetManager.getAsset(id), Standards.getAssetType(...), DOM.get(...))
+R13 Module kommunizieren nur über einen zentralen EventBus (emit/on), nie über direkte Aufrufe fremder Module;
+    Event-Namen sind zentrale Konstanten, keine verstreuten String-Literale; Fehler in Event-Handlern werden
+    strukturiert protokolliert (Event-Name + Fehlerobjekt, kein reiner String)
+R14 Keine geratenen IDs/Direktzugriffe (kein direkter Zugriff auf das globale document-Objekt außerhalb von
+    DOM.js — auch nicht querySelector/createElement, nicht nur getElementById —, kein project.assets[0], kein
+    verstreuter Typ-Stringvergleich); Zugriff nur über definierte Getter (z. B. AssetManager.getAsset(id),
+    Standards.getAssetType(...), DOM.get(...)/DOM.query(...)/DOM.create(...))
 R15 Bounded Contexts: jedes Modul legt/ändert/löscht Dateien nur im eigenen Verzeichnis.
     Core→js/core/*, Standards→js/standards/*+data/standards.json, Assets→js/assets/*,
     Kabel→js/cables/*, GIS→js/gis/*, Kabeleditor→js/cable-editor/*,
     Mengenermittlung→js/reporting/*, Export→js/export/*.
-    index.html ist nach Core dauerhaft fix und wird nie wieder geändert; künftige
-    Module tragen sich ausschließlich als ein Eintrag in js/core/module-manifest.js
-    ein, nie in main.js oder index.html
-R16 Öffentliche Schnittstellen sind unabhängig vom Speicher-/Implementierungs-Backend:
-    Backend-Wechsel (z. B. Storage von localStorage auf Datei/API) dürfen die
-    öffentliche API eines Moduls nie ändern, nur die interne Umsetzung
-    (Adapter-Pattern: öffentliche Methode delegiert an austauschbaren internen Adapter)
+    index.html darf nach Core nicht mehr strukturell verändert werden; Änderungen ausschließlich für globale
+    technische Metadaten oder Sicherheitsanforderungen (z. B. PWA-Manifest, favicon, CSP) und nur nach
+    expliziter Architekturentscheidung, nie durch ein Modul auf eigene Faust. Künftige Module tragen sich
+    ausschließlich als neuer Eintrag in js/core/module-manifest.js ein (nie main.js) — ausschließlich
+    Anhängen eines eigenen Eintrags erlaubt, niemals Ändern/Entfernen/Umsortieren bestehender fremder Einträge
+R16 Öffentliche Schnittstellen sind unabhängig vom Speicher-/Implementierungs-Backend: Backend-Wechsel
+    (z. B. Storage von localStorage auf Datei/API) dürfen die öffentliche API eines Moduls nie ändern, nur
+    die interne Umsetzung (Adapter-Pattern: öffentliche Methode delegiert an austauschbaren internen Adapter)
+R17 Getter-Methoden, die Collections zurückgeben, liefern niemals interne Referenzen, sondern Kopien;
+    Mutation ausschließlich über definierte Methoden (add/remove/update), nie über den Rückgabewert eines Getters
 
 ## Rollentrennung
 
@@ -62,7 +70,7 @@ Builder darf nie die eigene Arbeit abnehmen.
 
 ## Build-Reihenfolge (ein Modul = ein neuer Chat)
 
-1. Core (ProjectManager, EventBus, ObjectRegistry, DOM, Storage, ModuleLoader)
+1. Core (EventBus, ObjectRegistry, DOM, ProjectManager, Storage, ModuleLoader/main.js)
 2. Standards
 3. Asset-System
 4. Kabelsystem

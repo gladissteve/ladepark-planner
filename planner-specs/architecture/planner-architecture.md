@@ -54,12 +54,28 @@ R19 Zugriff auf die in der Registry verwalteten Core-Singleton-Instanzen (aktuel
 
 ## Rollentrennung
 
-- **Architect**: kennt Architektur + Registry + Modul-Contract, erzeugt nur den Builder-Prompt, danach Schluss
-- **Builder**: kennt Architektur + Registry + eigenen Modul-Contract/-Schema/-Seed-Data, kein Schreibzugriff auf Registry
-- **Auditor**: kennt Architektur + Registry + fertigen Code, prüft Konsistenz, erzeugt Manifest, schreibt Registry erst nach Bestätigung
+Vier dauerhafte Rollen, jede mit eigener, vollständig in sich
+geschlossener Rollendefinition unter architecture/roles/ (verbindliche
+Liste in architecture/role-registry.json, Gesamtüberblick inkl.
+Zustandsdiagramm in architecture/roles/README.md; Session-Start je
+Rolle über die Befehle /architect, /builder, /auditor, /dirigent, siehe
+CLAUDE.md). Diese kompakte Übersicht hier ersetzt nicht die
+Detaildefinition in den einzelnen Rollendateien — bei Widerspruch gilt
+die jeweilige Rollendatei als Detailquelle, R1–R19 in diesem Dokument
+bleiben in jedem Fall übergeordnet (siehe ADR-011).
 
-Builder darf nie die eigene Arbeit abnehmen. Architektur-Änderungen (neue/geänderte R-Regeln) erfolgen nur
-nach expliziter Absprache — kein Rolle ändert R1–R19 im Rahmen ihrer eigentlichen Aufgabe eigenständig.
+- **Architect**: kennt Architektur + Registry + Modul-Contract, verhandelt Contracts, erzeugt Builder-Snapshot und (nach Builder-Abschluss) Audit-Request, schreibt niemals Registry oder Anwendungscode.
+- **Builder**: kennt ausschließlich den ihm übergebenen Builder-Snapshot, liefert Produktionscode innerhalb des Bounded Context, kein Schreibzugriff auf Registry/Architektur/Contract, darf nie die eigene Arbeit abnehmen.
+- **Auditor**: kennt Architektur + Registry + fertigen Code + Audit-Request, prüft Konsistenz, erzeugt Manifest-Vorschlag; schreibt planner-registry.json (nur in einer zweiten, eigenen Session, ausschließlich auf Basis einer vom Dirigenten materialisierten, menschlich bestätigten Confirmation-Datei — siehe ADR-005, ADR-011).
+- **Dirigent**: orchestriert den Ablauf zwischen den Rollen, holt die menschliche Bestätigung zu einem Manifest-Vorschlag ein und materialisiert daraus die Confirmation-Datei für den Auditor, ist die einzige Rolle mit Schreibzugriff auf role-registry.json (ausschließlich Anhängen neuer Rollen), trifft selbst keine fachlichen Architekturentscheidungen und schreibt planner-registry.json nie selbst.
+
+Jede Rolle gilt ausschließlich für eine Claude-Code-Session; ein
+Rollenwechsel innerhalb derselben Session ist nicht vorgesehen (das
+verhindert insbesondere, dass eine Builder-Session sich selbst zur
+Auditor-Session umdeklariert).
+
+Builder darf nie die eigene Arbeit abnehmen; Auditor schreibt oder ändert nie Anwendungscode. Architektur-Änderungen (neue/geänderte R-Regeln) erfolgen nur
+nach expliziter Absprache — keine Rolle ändert R1–R19 im Rahmen ihrer eigentlichen Aufgabe eigenständig.
 
 ## Header-Felder jedes Modul-Contracts
 

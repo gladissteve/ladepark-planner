@@ -1,0 +1,64 @@
+{
+  "registryVersion": "1.0",
+  "note": "Analog zu planner-registry.json/module-manifest.js: append-only. Bestehende Eintraege werden nie geaendert, entfernt oder umsortiert (siehe R15/R18-Prinzip). Ausschliesslich die Rolle Dirigent haengt neue Eintraege an, siehe architecture/roles/dirigent.md.",
+  "roles": [
+    {
+      "name": "Architect",
+      "roleFile": "planner-specs/architecture/roles/architect.md",
+      "slashCommand": "/architect",
+      "commandFile": ".claude/commands/architect.md",
+      "endsWhen": "Builder-Snapshot bzw. Audit-Request erzeugt und uebergeben",
+      "handsOffTo": ["Builder", "Dirigent", "Auditor"],
+      "canWrite": [
+        "planner-specs/modules/<name>/contract.md",
+        "planner-specs/module-prompts/<name>-builder.md",
+        "planner-specs/module-prompts/<name>-audit-request.md",
+        "planner-specs/architecture/decisions.md (nur Anhaengen)"
+      ],
+      "status": "REVIEW",
+      "addedDate": "2026-07-23"
+    },
+    {
+      "name": "Builder",
+      "roleFile": "planner-specs/architecture/roles/builder.md",
+      "slashCommand": "/builder",
+      "commandFile": ".claude/commands/builder.md",
+      "endsWhen": "\"MODUL <n> FERTIG.\" ausgegeben, Smoke-Test durch Projektverantwortlichen erfolgt",
+      "handsOffTo": ["Architect"],
+      "canWrite": [
+        "Dateien gemaess Creates/Modifies/Deletes im jeweiligen module-prompts/<name>-builder.md"
+      ],
+      "status": "REVIEW",
+      "addedDate": "2026-07-23"
+    },
+    {
+      "name": "Auditor",
+      "roleFile": "planner-specs/architecture/roles/auditor.md",
+      "slashCommand": "/auditor",
+      "commandFile": ".claude/commands/auditor.md",
+      "endsWhen": "Phase 1: \"AUDIT <NAME> ABGESCHLOSSEN.\" ausgegeben, Manifest-Vorschlag vorliegt. Phase 2 (neue Session): \"REGISTRY <NAME> AKTUALISIERT.\" ausgegeben",
+      "handsOffTo": ["Dirigent"],
+      "canWrite": [
+        "planner-specs/architecture/planner-registry.json (nur Phase 2, nur auf Basis einer vom Dirigenten materialisierten Confirmation-Datei)"
+      ],
+      "status": "REVIEW",
+      "addedDate": "2026-07-23",
+      "note": "Korrektur 2026-07-23: Registry-Schreibrecht von Dirigent zu Auditor verschoben (siehe ADR-011, Rueckmeldung Projektverantwortlicher)."
+    },
+    {
+      "name": "Dirigent",
+      "roleFile": "planner-specs/architecture/roles/dirigent.md",
+      "slashCommand": "/dirigent",
+      "commandFile": ".claude/commands/dirigent.md",
+      "endsWhen": "naechste faellige Rolle samt Eingabeartefakt benannt; Confirmation-Datei erzeugt, falls ein Manifest bestaetigt wurde",
+      "handsOffTo": ["Architect", "Builder", "Auditor", "Dirigent"],
+      "canWrite": [
+        "planner-specs/module-prompts/<name>-registry-confirmation.md (nur nach Bestaetigung)",
+        "planner-specs/architecture/role-registry.json (nur Anhaengen)"
+      ],
+      "status": "REVIEW",
+      "addedDate": "2026-07-23",
+      "note": "Korrektur 2026-07-23: schreibt planner-registry.json NICHT mehr selbst (siehe ADR-011, Rueckmeldung Projektverantwortlicher)."
+    }
+  ]
+}

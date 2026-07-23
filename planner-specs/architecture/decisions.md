@@ -100,6 +100,115 @@ Status: accepted
 Begründung: Ein öffentliches Repo kann sich zwischen Architect-Lauf und Builder-Lauf ändern; ohne Pinning könnten beide Rollen faktisch auf unterschiedlichen Ständen arbeiten, ohne dass das sichtbar wird.
 
 
+# ADR-011
+Datum: 2026-07-23 (korrigiert am 2026-07-23, siehe "Historie" unten)
+Entscheidung: Einführung einer dauerhaften Rollenarchitektur für
+Claude-Code-Sessions. Vier Rollen (Architect, Builder, Auditor,
+Dirigent), jede mit eigener, vollständig in sich geschlossener
+Rollendefinition unter architecture/roles/<rolle>.md (verbindliche
+Liste in architecture/role-registry.json, neu, append-only analog
+R15/R18). Root-CLAUDE.md legt selbst keine Rolle mehr fest, sondern ist
+rollenneutral; jede Session startet über genau einen von vier festen
+Befehlen (/architect, /builder, /auditor, /dirigent, hinterlegt unter
+.claude/commands/), der die vollständige Rollendatei laedt. Ein
+Rollenwechsel innerhalb derselben Session ist nicht vorgesehen.
+
+Registry-Schreibvorgang (ergänzt ADR-005/ADR-008 zum "Dass" um das
+"Wer"): der Auditor schreibt architecture/planner-registry.json --
+abweichend vom Wortlaut "Der Auditor selbst schreibt die Registry nie"
+in ADR-008, der sich dort auf das unmittelbare Schreiben direkt im
+Anschluss an die eigene Prüfung bezog. Der tatsächliche Schreibvorgang
+geschieht ausschließlich in einer NEUEN, zweiten Auditor-Session
+("Phase 2"), ausgelöst durch eine vom Dirigenten materialisierte Datei
+module-prompts/<name>-registry-confirmation.md (Struktur: templates/
+registry-confirmation-prompt.md), die die explizite Bestätigung des
+Projektverantwortlichen referenziert und den bestätigten Manifest-
+Inhalt wörtlich enthält. Diese zweite Session bewertet nichts neu,
+sondern übernimmt den bereits geprüften und bestätigten Inhalt
+unverändert. Der Dirigent bleibt reiner Koordinator: er stellt die
+Bestätigung fest und materialisiert die Confirmation-Datei, schreibt
+aber architecture/planner-registry.json zu keinem Zeitpunkt selbst.
+Details: architecture/roles/README.md (Zustandsdiagramm), architecture/
+roles/auditor.md, architecture/roles/dirigent.md.
+
+Rolle Dirigent zusätzlich zuständig für: architecture/role-registry.json
+pflegen (ausschließlich Anhängen). Details: architecture/roles/
+README.md.
+
+Ergänzung vom 2026-07-23 (Rückmeldung Projektverantwortlicher): explizit
+aufgenommener Grundsatz "Trennung von Erzeugung und Bewertung" -- eine
+Rolle darf niemals das Artefakt bewerten, freigeben oder nachträglich
+korrigieren, das sie selbst erzeugt hat (Details und die vier
+rollenspezifischen Ausprägungen: architecture/roles/README.md, gleich-
+namiger Abschnitt; zusätzlich als kurzer Verweis in jeder einzelnen
+Rollendatei verankert). Dieser Grundsatz war vorher bereits implizit in
+Einzelregeln enthalten (Builder nimmt nie eigene Arbeit ab, Auditor
+schreibt Findings nicht ohne Beleg um, Dirigent trifft keine fachlichen
+Entscheidungen) und wird hiermit als eigenständiges, benanntes Prinzip
+festgehalten, das bei künftigen Rollenerweiterungen zuerst geprüft
+werden soll, bevor eine neue Ausnahme eingeführt wird.
+
+Status: proposed
+Begründung: Die bisherige Ein-Datei-CLAUDE.md legte dauerhaft die Rolle
+Builder fest und verhinderte damit, dass dieselbe Codebasis auch für
+Architect- oder Auditor-Sessions genutzt werden konnte, ohne CLAUDE.md
+manuell umzuschreiben — mit dem Risiko, dass eine solche Umschreibung
+unbeabsichtigt vom Chatverlauf statt von einer dauerhaften Quelle
+abhängt. Die vier bisher schon informell genutzten Rollen
+(planner-architecture.md "Rollentrennung"; templates/architect-
+prompt.md, builder-prompt.md, auditor-prompt.md) hatten zudem keine
+dauerhafte, sessionfähige Form und keine explizite Dirigenten-Rolle für
+die Lifecycle-Orchestrierung und den bislang nicht eindeutig
+zugewiesenen tatsächlichen Registry-Schreibschritt (module-
+lifecycle.md Schritt 11 nannte bisher nur DASS, nicht WER schreibt). Der
+Registry-Schreibvorgang liegt beim Auditor statt beim Dirigenten, weil
+der Auditor bereits Registry, Code und Findings kennt und der Dirigent
+ausdrücklich Koordinator, kein Qualitätsprüfer sein soll (Rückmeldung
+Projektverantwortlicher, 2026-07-23).
+
+Historie (ursprünglicher Entwurf vom 2026-07-23, noch am selben Tag vor
+Bestätigung korrigiert): ursprünglich sollte der Dirigent selbst
+architecture/planner-registry.json schreiben. Verworfen auf Rückmeldung
+des Projektverantwortlichen: der Dirigent sei Koordinator, kein
+Qualitätsprüfer; der Auditor kenne Registry, Code und Findings bereits
+und solle den Schreibvorgang konsequenterweise selbst ausführen.
+Ersetzt durch die obige, zweiphasige Auditor-Lösung.
+
+Freigabe-Hinweis: dieses ADR wird NICHT vom Architect eigenständig auf
+Status "accepted" gesetzt, auch nicht nach einer informellen Zustimmung
+im Chat. Analog zur Änderung von R1–R19 ("nur nach expliziter
+Absprache") setzt ausschließlich der Projektverantwortliche diesen
+Status explizit und gesondert auf "accepted" -- der Architect trägt
+diese Bestätigung danach lediglich nach (Datum + Bezug, wie bei
+ADR-006/ADR-010). Erst ab "accepted" gelten die in dieser und der
+vorangegangenen Session bereits vorgenommenen Änderungen an CLAUDE.md
+und an planner-architecture.md ("Rollentrennung") als verbindlich
+integriert.
+
+# ADR-012
+Datum: 2026-07-23
+Entscheidung: Korrektur einer in sich widersprüchlichen Formulierung in
+modules/standards/contract.md, Abschnitt "Abnahmekriterien". Statt
+"`Standards.init()` registriert sich erst nach erfolgreichem Erstladen
+selbst in der Registry unter Key `standards` (R18)." nun: "Die in
+`main.js` exportierte `init()`-Funktion (R18) registriert Standards erst
+nach erfolgreichem Erstladen selbst in der Registry unter Key
+`standards`." Contract-Version entsprechend von 1.0.0 auf 1.0.1
+angehoben. Keine Änderung an R1-R19, an der Public API, an der Registry
+oder am Anwendungscode.
+Begründung: Auditor-Fund vom 2026-07-23: Der Abnahmekriterien-Satz
+sprach von einer Methode "Standards.init()", waehrend sowohl R18
+(planner-architecture.md) als auch der eigene Abschnitt "Datenladen"
+desselben Contracts uebereinstimmend main.js als Entry Point mit einer
+exportierten init()-Funktion definieren, die sich selbst in der Registry
+registriert -- keine Methode auf dem Standards-Objekt. Das ist ein
+Widerspruch innerhalb des Contracts, keine Architekturverletzung und
+kein Builder-Fehler; der Builder-Code bleibt unveraendert. Da der
+Contract STATUS FROZEN ist, erfolgt die Korrektur gemaess
+module-lifecycle.md Schritt 5 ausschliesslich ueber diese neue ADR plus
+Versionsanhebung, nicht durch stilles Editieren.
+Status: accepted
+
 ## Status-Semantik für diese Entscheidungen (gilt für alle ADRs oben und künftige)
 
 - **accepted** = verbindliche Architektur, muss umgesetzt werden

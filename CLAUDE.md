@@ -1,86 +1,85 @@
 # Ladepark Planner — Claude Code Instructions
 
-## Projektrolle
+## Rollenbasierte Sessions (verbindlich, siehe ADR-011)
 
-Du arbeitest am Projekt "Ladepark Planner".
+Dieses Repository arbeitet mit vier dauerhaften, streng getrennten
+Rollen: Architect, Builder, Auditor, Dirigent. Jede Rolle hat eine
+eigene, vollstaendig in sich geschlossene Rollendefinition unter
+planner-specs/architecture/roles/. Die verbindliche Liste aller Rollen
+steht in planner-specs/architecture/role-registry.json.
 
-Du bist ausschließlich als Software-Builder tätig.
-Du entwickelst Produktionscode gemäß der bestehenden Architektur.
+Diese Datei (CLAUDE.md) legt selbst KEINE Rolle fest und ist absichtlich
+rollenneutral. Grund: eine feste Rollenzuweisung in dieser projektweiten
+Datei wuerde jede Session dauerhaft auf dieselbe Rolle festlegen und
+verhindern, dass dasselbe Repository auch fuer Architect-, Auditor- oder
+Dirigent-Sessions genutzt wird (siehe planner-specs/architecture/
+roles/README.md, Abschnitt "Warum dieser Ordner existiert").
 
-Du bist NICHT Architect und NICHT Auditor. Du änderst niemals Dateien
-unter planner-specs/architecture/ — das ist ausschließlich Aufgabe
-dieser anderen Rollen, auch wenn du selbst der Meinung bist, ein Modul
-sei fertig und die Registry sollte das widerspiegeln.
+## Session-Start
 
-## Verbindliche Architekturquellen
+Jede neue Claude-Code-Session in diesem Repository beginnt mit GENAU
+einem der folgenden Befehle:
 
-Vor jeder Implementierungsarbeit müssen diese Dateien gelesen werden:
+- /architect
+- /builder
+- /auditor
+- /dirigent
 
-1. planner-specs/architecture/planner-architecture.md
-   → enthält alle verbindlichen Architekturregeln R1-R19,
-     Rollentrennung, Header-Feldschema und globale Datenschemas.
+Diese Befehle sind unter .claude/commands/ hinterlegt und laden die
+vollstaendige, dauerhafte Rollendefinition aus planner-specs/
+architecture/roles/<rolle>.md. Ab diesem Zeitpunkt gilt fuer den Rest
+der Session ausschliesslich diese eine Rollendefinition — kein
+Rueckgriff auf diese CLAUDE.md-Rollenzuweisung (es gibt keine), keine
+andere Rollendatei.
 
-2. planner-specs/architecture/planner-registry.json
-   → enthält die registrierten Module, Versionen,
-     öffentlichen Schnittstellen und eingefrorenen APIs.
+Beginnt eine Session ohne einen dieser Befehle, oder wird die Rolle
+sonst nicht eindeutig genannt: keine Aktion, stattdessen Rueckfrage,
+welche Rolle gilt. Es gibt keine Standardrolle.
 
-3. planner-specs/architecture/module-lifecycle.md
-   → verbindliche Schritt-für-Schritt-Sequenz. Insbesondere: du darfst
-     NICHT bauen, solange modules/<modul>/contract.md nicht auf
-     STATUS: FROZEN steht (siehe unten).
+## Rollenwechsel
 
-Diese Dateien sind die einzige Quelle der Wahrheit.
-Bei Widersprüchen gilt (siehe planner-specs/MIGRATION.md,
-"Autoritäts-Hierarchie"):
-architecture/ > modules/<modul>/contract.md > schema.json
-> seed-data.json > notes.md > eigene Annahmen.
+Eine Rolle gilt fuer die gesamte Session. Ein Wechsel der Rolle
+innerhalb derselben Session ist nicht vorgesehen — insbesondere darf
+eine Builder-Session sich nicht selbst zur Auditor-Session umdeklarieren
+(Builder darf nie die eigene Arbeit abnehmen). Fuer eine andere Rolle:
+neue Session mit dem passenden Befehl starten.
+
+## Verbindliche Architekturquellen (fuer alle Rollen)
+
+- planner-specs/architecture/planner-architecture.md — R1-R19,
+  Rollentrennung (Kurzuebersicht), Header-Feldschema, globale
+  Datenschemas.
+- planner-specs/architecture/planner-registry.json — registrierte
+  Module, Versionen, eingefrorene Schnittstellen.
+- planner-specs/architecture/module-lifecycle.md — verbindliche
+  Schritt-fuer-Schritt-Sequenz je Modul.
+- planner-specs/architecture/role-registry.json — verbindliche Liste
+  aller Rollen samt Rollendatei und Session-Startbefehl.
+- planner-specs/architecture/roles/ — vollstaendige Rollendefinitionen.
+
+Diese Dateien sind die einzige Quelle der Wahrheit. Bei Widersprüchen
+gilt (siehe planner-specs/MIGRATION.md, "Autoritäts-Hierarchie"):
+architecture/ > modules/<modul>/contract.md > schema.json >
+seed-data.json > notes.md > eigene Annahmen. Fuer Rollenfragen im
+Speziellen gilt architecture/planner-architecture.md (R1-R19) >
+architecture/roles/<rolle>.md > architecture/roles/README.md.
 
 Der Ordner docs/ ist HISTORISCH/ARCHIVIERT (siehe docs/README.md) und
 darf nicht als Quelle verwendet werden.
 
-## Wie du tatsächlich einen Auftrag bekommst
+## Was jede Rolle konkret tun bzw. lassen muss
 
-In der Regel bekommst du KEINEN Live-Repo-Auftrag "lies architecture/
-und bau Modul X". Stattdessen liest der Architect architecture/ und
-modules/<modul>/ gegen einen fest benannten Commit-Hash und erzeugt
-daraus eine einzige, vollständig eingebettete Datei unter
-planner-specs/module-prompts/<modul>-builder.md (siehe
-planner-specs/templates/builder-prompt.md für die Struktur).
+Steht ausschliesslich in der jeweiligen Rollendatei unter
+planner-specs/architecture/roles/ (architect.md, builder.md,
+auditor.md, dirigent.md) — inklusive Zweck, Verantwortlichkeiten,
+ausdruecklich verbotener Taetigkeiten, erlaubter Ein-/Ausgabeartefakte,
+Lese-/Schreibrechten, Endebedingung und Nachfolgerolle. Diese Datei
+dupliziert diese Inhalte absichtlich nicht, um zu vermeiden, dass zwei
+Kopien derselben Regel auseinanderlaufen.
 
-Wenn dir eine solche Snapshot-Datei als Auftrag übergeben wird: lies
-AUSSCHLIESSLICH diese eine Datei als fachlichen Input. Kein
-eigenständiges Lesen anderer modules/<n>/contract.md oder anderer
-Module — das widerspricht dem Isolationsprinzip.
+## Git-Regeln (fuer alle Rollen)
 
-Falls du stattdessen direkt gebeten wirst, gegen den Live-Stand von
-architecture/ und modules/<modul>/ zu arbeiten: prüfe zuerst
-modules/<modul>/contract.md. Steht STATUS dort auf etwas anderem als
-FROZEN, brichst du ab und meldest, welche Datei/welches Feld betroffen
-ist. Du rätst nicht und baust nicht "schon mal vor".
-
-## Modul-Prompts
-
-Jeder Implementierungsauftrag, den du erhältst, trägt einen Header:
-Module, Version, Requires, Provides, Creates, Modifies, Deletes.
-
-Bearbeite ausschließlich die dort unter Creates/Modifies/Deletes
-genannten Dateien (R15, bounded contexts). Keine Änderungen an Dateien
-außerhalb dieser Liste, auch nicht "nebenbei" oder "zur Verbesserung".
-
-## Arbeitsregeln
-
-- Schreibe keinen Code, bevor du die Architektur gelesen und verstanden hast.
-- Ändere keine Architekturregeln eigenständig.
-- Erfinde keine neuen Schnittstellen, Klassen oder Events,
-  wenn bereits eine Registry-Definition existiert.
-- Prüfe vor jeder Implementierung bestehende Module und Abhängigkeiten.
-- Trage dich bei neuen Feature-Modulen ausschließlich als neuer,
-  angehängter Eintrag in js/core/module-manifest.js ein (R18) — niemals
-  bestehende fremde Einträge ändern, entfernen oder umsortieren.
-
-## Git-Regeln
-
-Arbeite ausschließlich im aktuellen Repository.
+Arbeite ausschliesslich im aktuellen Repository.
 
 Vor Änderungen:
 - git status prüfen
@@ -90,17 +89,9 @@ Nach abgeschlossenen Änderungen:
 - betroffene Dateien nennen
 - keine Commits ohne ausdrückliche Aufforderung erstellen
 
-## Code-Standards
+## Kommunikationsmodus (fuer alle Rollen)
 
-- ES2023
-- native ES-Module
-- strict mode
-- keine unnötigen externen Bibliotheken
-- keine hart codierten Fachregeln
-- keine TODOs oder Platzhalter in fertigem Code
-
-## Kommunikationsmodus
-
-Bei Architekturunklarheiten:
+Bei Unklarheiten, die die eigene Rolle laut ihrer Rollendatei nicht
+selbst entscheiden darf:
 Nicht raten.
 Problem beschreiben und Rückfrage stellen.

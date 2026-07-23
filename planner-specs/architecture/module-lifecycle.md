@@ -54,8 +54,17 @@ zur Aufnahme in die Registry. Kein Schritt wird uebersprungen.
    Architektur") wird verworfen, nicht gemeldet.
 10. Mensch bestaetigt das vorgeschlagene Manifest (oder verlangt
     Korrekturen -- zurueck zu Schritt 7/9, je nachdem was betroffen ist).
+    Rollenzuordnung seit ADR-011: die Rolle Dirigent stellt diese
+    Bestaetigung fest und materialisiert daraus module-prompts/<name>-
+    registry-confirmation.md (Struktur nach templates/registry-
+    confirmation-prompt.md) -- enthaelt den bestaetigten Manifest-Inhalt
+    woertlich.
 11. Registry-Update -- architecture/planner-registry.json wird per
     vollstaendigem Neuschreiben aktualisiert (bestehende Eintraege
     unveraendert, neuer Eintrag inkl. builtAgainstCommit angehaengt).
-    Erst jetzt gilt das Modul als integriert und darf von kuenftigen
-    Modulen als Requires referenziert werden.
+    Rollenzuordnung seit ADR-011: eine neue Auditor-Session (nicht der
+    Dirigent) fuehrt diesen Schreibvorgang aus, ausschliesslich auf
+    Basis der in Schritt 10 materialisierten Confirmation-Datei (siehe
+    architecture/roles/auditor.md, Phase 2). Erst jetzt gilt das Modul
+    als integriert und darf von kuenftigen Modulen als Requires
+    referenziert werden.

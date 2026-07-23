@@ -12,10 +12,18 @@ tatsaechlich eingefrorenen Contract-Inhalt traegt,
 22c83231c8d0cf58d148ebad0f6d62b00930aff2 ("Freeze standards module
 specification"). Core selbst bleibt bei frozenAtCommit d77d054.
 
+Contract-Korrektur (Architect, 2026-07-23, siehe ADR-012 in
+architecture/decisions.md, Status: proposed -- Bestaetigung durch den
+Projektverantwortlichen steht noch aus): Abschnitt "Abnahmekriterien"
+widersprach R18 und dem eigenen Abschnitt "Datenladen" (beide definieren
+main.js mit exportierter init()-Funktion, keine Methode
+Standards.init()). Reine Formulierungskorrektur, keine Architektur- oder
+Public-API-Aenderung. Version entsprechend auf 1.0.1 angehoben.
+
 ## Header
 
 - **Module**: Standards
-- **Version**: 1.0.0
+- **Version**: 1.0.1
 - **Requires**: Core >=1.0.0 (FROZEN, siehe architecture/planner-registry.json, frozenAtCommit d77d054)
 - **Registry-Key (R18)**: standards
 - **Creates**:
@@ -140,8 +148,9 @@ ausserhalb dieses Verzeichnisses.
 
 ## Abnahmekriterien
 
-- [ ] `Standards.init()` registriert sich erst nach erfolgreichem
-      Erstladen selbst in der Registry unter Key `standards` (R18).
+- [ ] Die in `main.js` exportierte `init()`-Funktion (R18) registriert
+      Standards erst nach erfolgreichem Erstladen selbst in der Registry
+      unter Key `standards`.
 - [ ] Alle Getter liefern Kopien, keine internen Referenzen (R17).
 - [ ] Keine hartcodierten Fachregeln im Code (R1) -- alle Werte kommen aus
       data/standards.json.

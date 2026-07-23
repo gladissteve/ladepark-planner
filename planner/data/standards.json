@@ -1,0 +1,125 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-07-23",
+  "author": "gladissteve",
+  "assetTypes": {
+    "trafo": {
+      "id": "trafo",
+      "code": "TRAFO",
+      "name": "Trafostation (inkl. NSHV)",
+      "color": "#e8871e",
+      "defaultCable": null
+    },
+    "hpc": {
+      "id": "hpc",
+      "code": "HPC",
+      "name": "HPC-Lader",
+      "color": "#2f9e44",
+      "defaultCable": null
+    },
+    "camera": {
+      "id": "camera",
+      "code": "CAM",
+      "name": "Kamera (PoE)",
+      "color": "#1c7ed6",
+      "defaultCable": { "cableId": "cat6a", "crossSection": null }
+    },
+    "light": {
+      "id": "light",
+      "code": "LEU",
+      "name": "Mastleuchte",
+      "color": "#c98a00",
+      "defaultCable": { "cableId": "nyy-j", "crossSection": "5x2_5" },
+      "attributes": { "notAus": false }
+    }
+  },
+  "cables": {
+    "nyy-j": {
+      "id": "nyy-j",
+      "code": "NYY-J",
+      "name": "NYY-J (Energie)",
+      "category": "Energie",
+      "crossSections": [
+        { "crossSection": "5x2_5", "maxLength": null },
+        { "crossSection": "4x16", "maxLength": null },
+        { "crossSection": "4x25", "maxLength": null },
+        { "crossSection": "4x35", "maxLength": null },
+        { "crossSection": "4x50", "maxLength": null },
+        { "crossSection": "4x70", "maxLength": null },
+        { "crossSection": "4x95", "maxLength": null },
+        { "crossSection": "4x120", "maxLength": null },
+        { "crossSection": "4x150", "maxLength": null },
+        { "crossSection": "4x185", "maxLength": null },
+        { "crossSection": "4x240", "maxLength": null }
+      ]
+    },
+    "nycwy-4konz": {
+      "id": "nycwy-4konz",
+      "code": "NYCWY-4KONZ",
+      "name": "NYCWY 4-Konzentrisch (Energie)",
+      "category": "Energie",
+      "crossSections": [
+        { "crossSection": "35-16", "maxLength": null },
+        { "crossSection": "50-25", "maxLength": null },
+        { "crossSection": "70-35", "maxLength": null },
+        { "crossSection": "95-50", "maxLength": null },
+        { "crossSection": "120-70", "maxLength": null },
+        { "crossSection": "150-70", "maxLength": null }
+      ]
+    },
+    "n2xch": {
+      "id": "n2xch",
+      "code": "N2XCH",
+      "name": "N2XCH (Energie, Leistung)",
+      "category": "Energie (Leistung)",
+      "crossSections": [
+        { "crossSection": "4x95", "maxLength": null },
+        { "crossSection": "4x185", "maxLength": null },
+        { "crossSection": "4x240", "maxLength": null }
+      ]
+    },
+    "cat6a": {
+      "id": "cat6a",
+      "code": "CAT6A",
+      "name": "Cat6A (Daten, PoE)",
+      "category": "Daten",
+      "crossSections": [
+        { "crossSection": null, "maxLength": 90 }
+      ]
+    }
+  },
+  "chargerTypes": {
+    "abb-terra-184": {
+      "id": "abb-terra-184",
+      "code": "ABB_TERRA_184",
+      "name": "Terra 184",
+      "powerKW": 180,
+      "defaultCable": { "cableId": "n2xch", "crossSection": "4x95" }
+    },
+    "alpitronic-hyc300": {
+      "id": "alpitronic-hyc300",
+      "code": "ALPITRONIC_HYC300",
+      "name": "HYC300",
+      "powerKW": 300,
+      "defaultCable": { "cableId": "n2xch", "crossSection": "4x185" }
+    },
+    "alpitronic-hyc400": {
+      "id": "alpitronic-hyc400",
+      "code": "ALPITRONIC_HYC400",
+      "name": "HYC400",
+      "powerKW": 400,
+      "defaultCable": { "cableId": "n2xch", "crossSection": "4x240" }
+    }
+  },
+  "materials": {},
+  "rules": [
+    {
+      "id": "cat6a-max-length",
+      "field": "cable.length",
+      "op": ">",
+      "value": 90,
+      "severity": "warning",
+      "message": "Cat6A laenger als 90 m (PoE/Signal-Grenzwert)"
+    }
+  ]
+}

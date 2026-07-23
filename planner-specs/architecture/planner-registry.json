@@ -32,6 +32,45 @@
       "status": "FROZEN",
       "frozenDate": "2026-07-23",
       "frozenAtCommit": "d77d054"
+    },
+    {
+      "name": "Standards",
+      "version": "1.0.0",
+      "dependencies": ["Core >=1.0.0"],
+      "exports": ["Standards"],
+      "publicApi": [
+        "Standards.getAssetType(id)",
+        "Standards.getAssetTypes()",
+        "Standards.getCable(id)",
+        "Standards.getCables()",
+        "Standards.getCableCrossSection(id, crossSection)",
+        "Standards.getChargerType(id)",
+        "Standards.getChargerTypes()",
+        "Standards.getMaterial(id)",
+        "Standards.getMaterials()",
+        "Standards.getRules()",
+        "Standards.validate(context)",
+        "Standards.getVersion()",
+        "Standards.reload() [async]"
+      ],
+      "eventsPublished": [
+        "standards:loaded",
+        "standards:load-error"
+      ],
+      "eventsConsumed": [],
+      "schemaVersion": "n/a (Standards persistiert keine Projektdaten, R12 nicht anwendbar)",
+      "compatibleWith": "Planner Architecture v1 (R1-R19)",
+      "files": [
+        "planner/js/standards/main.js",
+        "planner/js/standards/Standards.js",
+        "planner/js/standards/events.js",
+        "planner/data/standards.json"
+      ],
+      "hash": "ba3b3e108c366034beae652b3200663d894a25938fead38c288d2ac995200aea",
+      "builtAgainstCommit": "OFFEN (uncommitted, siehe Audit-Request-Header)",
+      "status": "REVIEW",
+      "frozenDate": "n/a",
+      "frozenAtCommit": "n/a"
     }
   ]
 }

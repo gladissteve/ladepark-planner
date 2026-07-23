@@ -1,3 +1,7 @@
+<!-- STATUS: HISTORISCH/ARCHIVIERT ab 2026-07-22 — nicht mehr aktuell.
+     Verbindliche Quelle: planner-specs/architecture/planner-architecture.md
+     Siehe docs/README.md fuer Details. -->
+
 # Planner Architecture v1 — R1–R19
 
 ## Regeln

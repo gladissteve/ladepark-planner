@@ -31,11 +31,45 @@ Status: accepted
 Begründung: Ein Manifest zum Zeitpunkt der Prompt-Erzeugung beschreibt nur die Absicht, nicht die tatsächliche Umsetzung; erster Gemini-Audit-Durchlauf zeigte zudem, dass Auditor-Ergebnisse fehlerhaft sein können und vor Übernahme verifiziert werden müssen.
 
 # ADR-006
-Noch nicht angelegt. Die Frage "Slug-Keys oder Anzeige-Strings als Key in
-seed-data.json" wird erst dann als ADR dokumentiert, wenn sie beim
-Architect-Lauf für Modul 2 tatsächlich entschieden wird und damit
-Konsequenzen hat — eine ADR für eine folgenlose Vorüberlegung anzulegen
-stiftet mehr Verwirrung als Nutzen.
+Datum: 2026-07-22
+Entscheidungsvorschlag (Dirigent, zur Bestätigung durch den Projektverantwortlichen):
+Objekt-Keys in data/standards.json (assetTypes, cables, chargerTypes,
+materials) sind der jeweilige Grossschreibungs-Code des Eintrags (z. B.
+TRAFO, HPC, NYYJ, ABB_TERRA184) — kein zusätzlicher, separater
+lowercase-Slug.
+Status: proposed
+Begründung: planner-architecture.md benennt jeden Eintrag der
+Start-Bibliotheken bereits über sein "Code"-Feld (Code TRAFO, Code HPC,
+Code CAM, Code LEU) — der Code ist damit bereits der eindeutige, stabile
+Fachbezeichner. Ein zweiter, paralleler lowercase-Slug als Key wäre eine
+zusätzliche ID für dieselbe Sache. R14 verlangt ohnehin Zugriff nur über
+Getter (Standards.getAssetType(code)); Code == Key vermeidet eine
+zusätzliche Mapping-Ebene zwischen Aufrufer-Code und internem Key. Ein
+lauffähiger Präzedenzfall mit dieser Konvention liegt bereits im
+archivierten Prototyp vor (planner-specs/archive/standards-prototype-v0)
+— als Referenz, nicht als Übernahme-Grundlage.
+Nicht Gegenstand dieses ADR: die strukturelle Frage "ein Eintrag pro
+Kabeltyp mit crossSections-Array" vs. "ein Eintrag pro Querschnitt-
+Variante" bei cables — das bleibt offener Punkt für den Architect-Lauf
+zu Modul 2 selbst.
+
+# ADR-010
+Datum: 2026-07-22
+Entscheidungsvorschlag (Dirigent, zur Bestätigung durch den Projektverantwortlichen):
+Core (v1.0.0) wird formal als FROZEN markiert (analog zur
+contract.md-Konvention aus module-lifecycle.md, auch ohne nachträglich
+angelegtes modules/core/contract.md, siehe MIGRATION.md). Dazu werden im
+Core-Eintrag von architecture/planner-registry.json die Felder
+frozenDate und frozenAtCommit ergänzt.
+Status: proposed
+Begründung: Der Decision Gate für jedes Folgemodul (module-lifecycle.md,
+Schritt 0) verlangt "Alle Requires-Abhängigkeiten in der Registry
+FROZEN". Core ist Requires für praktisch jedes künftige Modul; eine
+explizite Freeze-Markierung beseitigt jede Unklarheit, ob Core noch
+änderbar ist, bevor der Architect-Lauf für Modul 2 beginnt.
+Offener Punkt: aus dem gelieferten Repo-Snapshot liegt kein Commit-Hash
+vor (kein .git enthalten). frozenAtCommit bleibt "n/a (Hash ausstehend)",
+bis der tatsächliche Commit-Hash des aktuellen main-Standes genannt wird.
 
 # ADR-007
 Datum: 2026-07-22

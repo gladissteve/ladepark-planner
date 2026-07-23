@@ -1,11 +1,16 @@
 STATUS: FROZEN
-frozenAtCommit: d77d054
+frozenAtCommit: 22c83231c8d0cf58d148ebad0f6d62b00930aff2
 frozenDate: 2026-07-23
 
 Lifecycle-Hinweis (aus module-lifecycle.md): Aenderungen ab hier nur noch
 ueber eine neue ADR (architecture/decisions.md) plus Versionsanhebung,
 nie durch stilles Editieren dieser Datei. Freigegeben durch den
-Projektverantwortlichen am 2026-07-23.
+Projektverantwortlichen am 2026-07-23. Korrektur frozenAtCommit am
+2026-07-23 (Projektverantwortlicher): urspruenglich faelschlich auf
+d77d054 (Core-Freeze-Commit) gesetzt -- korrekt ist der Commit, der den
+tatsaechlich eingefrorenen Contract-Inhalt traegt,
+22c83231c8d0cf58d148ebad0f6d62b00930aff2 ("Freeze standards module
+specification"). Core selbst bleibt bei frozenAtCommit d77d054.
 
 ## Header
 

@@ -1,12 +1,12 @@
 ---
 Builder-Snapshot fuer Modul: Standards
-Erzeugt gegen Commit: d77d054
-Erzeugt am: 2026-07-23
-Contract eingefroren: STATUS FROZEN, frozenAtCommit d77d054, frozenDate 2026-07-23
+Erzeugt gegen Commit: 22c83231c8d0cf58d148ebad0f6d62b00930aff2
+Erzeugt am: 2026-07-23 (Commit-Referenz aktualisiert 2026-07-23, siehe Hinweis unten)
+Contract eingefroren: STATUS FROZEN, frozenAtCommit 22c83231c8d0cf58d148ebad0f6d62b00930aff2, frozenDate 2026-07-23
 
 ## Input Fingerprint
 
-architectureCommit: d77d054
+architectureCommit: 22c83231c8d0cf58d148ebad0f6d62b00930aff2
 contractFrozenDate: 2026-07-23
 
 inputFiles:
@@ -25,19 +25,19 @@ inputFiles:
   - path: planner-specs/modules/standards/notes.md
     sha256: 5de4829b0e43effce8957a74827391d62299c28d028def37063be45cf8df514
 
-WICHTIGER HINWEIS zum Abgleich Commit vs. Hash: `architectureCommit`
-(d77d054) und die sha256-Werte oben weichen bewusst voneinander ab.
-planner-specs/architecture/decisions.md, planner-registry.json sowie
-modules/standards/{contract.md,schema.json,seed-data.json,notes.md}
-wurden NACH diesem Commit im Rahmen des Architect-Laufs fuer Modul 2
-bearbeitet (Contract-Aushandlung, Cables-Restrukturierung,
-ADR-006-Erweiterung, ADR-010-Freeze) und sind zum Zeitpunkt dieses
-Snapshots noch nicht committed. Nur planner-architecture.md ist
-inhaltlich identisch mit dem Stand bei d77d054. Massgeblich fuer den
-tatsaechlichen Inhalt dieses Snapshots sind ausschliesslich die
-sha256-Werte oben, nicht der Commit-Hash -- der Commit-Hash bleibt als
-Anker fuer "das war der Repo-Zustand, gegen den Core FROZEN wurde"
-erhalten, ersetzt aber nicht die Fingerprint-Pruefung der Modul-2-Dateien.
+HINWEIS zum Abgleich Commit vs. Hash (aktualisiert 2026-07-23): Der
+fruehere Stand dieses Snapshots war gegen d77d054 materialisiert, obwohl
+6 der 7 eingebetteten Dateien zu diesem Zeitpunkt noch uncommitted waren
+(architectureCommit und sha256-Werte wichen bewusst voneinander ab, siehe
+vorherige Snapshot-Fassung). Dieser Widerspruch ist jetzt aufgeloest:
+planner-specs wurde ausserhalb dieser Sandbox lokal committed
+(Commit "Freeze standards module specification",
+22c83231c8d0cf58d148ebad0f6d62b00930aff2). Verifiziert: `git diff HEAD --
+planner-specs/` ist leer, alle sieben sha256-Werte oben sind identisch
+mit dem Stand vor dem Commit -- der Commit hat den Inhalt nicht
+veraendert, nur fixiert. architectureCommit (22c83231c8d0cf58d148ebad0f6d62b00930aff2)
+und alle sha256-Werte oben beziehen sich jetzt konsistent auf denselben,
+tatsaechlich committeten Stand.
 
 Rolle: Builder. Du kennst ausschliesslich diesen Prompt -- keine frueheren
 Chats, keine anderen Module, kein sonstiges Zusatzwissen. Du lieferst
@@ -46,7 +46,7 @@ Alternativen, keine Rueckfragen -- bei Unklarheit triff eine begruendete,
 konservative Entscheidung im Rahmen der unten eingebetteten Regeln und
 dokumentiere sie kurz als Code-Kommentar.
 
-# Immutable Rules (vollstaendige Kopie aus architecture/planner-architecture.md@d77d054)
+# Immutable Rules (vollstaendige Kopie aus architecture/planner-architecture.md@22c83231c8d0cf58d148ebad0f6d62b00930aff2)
 
 ## Regeln (R1-R19, verbindlich, unveraenderlich ausser durch explizite Absprache)
 
@@ -146,7 +146,7 @@ Selbstregistrierung, R18). Kein Zugriff auf ProjectManager, Storage oder DOM -- 
 absichtlich nicht eingebettet, um keine Kopplung an Funktionalitaet nahezulegen, die dieses Modul nicht
 braucht (siehe Contract: keine eigene Persistenz, kein DOM-Zugriff).
 
-## Genutzte Core-Signaturen (Kopie aus architecture/planner-registry.json@d77d054, nur die zwei benoetigten Singletons)
+## Genutzte Core-Signaturen (Kopie aus architecture/planner-registry.json@22c83231c8d0cf58d148ebad0f6d62b00930aff2, nur die zwei benoetigten Singletons)
 
 ```json
 {
@@ -175,7 +175,7 @@ Zugriff ausschliesslich ueber `registry.get('eventBus')` (R19) -- niemals `impor
 '../core/EventBus.js'`. Registrierung des eigenen Service unter Key `standards` erst nach erfolgreichem
 Erstladen (siehe Contract, Abschnitt "Datenladen").
 
-# Relevante Architecture Decision Records (Kopie aus architecture/decisions.md@d77d054, nur Standards-relevant)
+# Relevante Architecture Decision Records (Kopie aus architecture/decisions.md@22c83231c8d0cf58d148ebad0f6d62b00930aff2, nur Standards-relevant)
 
 ## ADR-002
 Entscheidung: Alle Fachregeln (Anlagentypen, Kabeltypen, Zuordnungen, Validierungsregeln) datengetrieben in
@@ -194,10 +194,10 @@ Status: accepted
 alle vier Kategorien; cables sind ein Eintrag pro Kabeltyp mit crossSections-Array, nicht ein Eintrag pro
 Querschnitt-Variante.)
 
-# Module Contract (vollstaendige Kopie aus modules/standards/contract.md@d77d054, STATUS FROZEN)
+# Module Contract (vollstaendige Kopie aus modules/standards/contract.md@22c83231c8d0cf58d148ebad0f6d62b00930aff2, STATUS FROZEN)
 
 STATUS: FROZEN
-frozenAtCommit: d77d054
+frozenAtCommit: 22c83231c8d0cf58d148ebad0f6d62b00930aff2
 frozenDate: 2026-07-23
 
 ## Header
@@ -330,7 +330,7 @@ dieses Verzeichnisses.
 - [ ] Kein direkter `document`-Zugriff (R14 -- Standards braucht ohnehin keinen DOM-Zugriff; falls doch,
       ausschliesslich ueber `DOM.*`).
 
-# Schema (vollstaendige Kopie aus modules/standards/schema.json@d77d054)
+# Schema (vollstaendige Kopie aus modules/standards/schema.json@22c83231c8d0cf58d148ebad0f6d62b00930aff2)
 
 ```json
 {
@@ -457,7 +457,7 @@ dieses Verzeichnisses.
 }
 ```
 
-# Seed-Data (vollstaendige Kopie aus modules/standards/seed-data.json@d77d054)
+# Seed-Data (vollstaendige Kopie aus modules/standards/seed-data.json@22c83231c8d0cf58d148ebad0f6d62b00930aff2)
 
 Diese Datei ist der Inhalt fuer die im Contract unter Creates genannte neue Datei
 `planner/data/standards.json`. Kein Laufzeit-Fallback, keine Kopie im JS-Code -- einfach 1:1 als Inhalt der
@@ -591,7 +591,7 @@ neu anzulegenden Datei verwenden (ggf. `updated` unveraendert lassen, nicht neu 
 }
 ```
 
-# Notes (vollstaendige Kopie aus modules/standards/notes.md@d77d054)
+# Notes (vollstaendige Kopie aus modules/standards/notes.md@22c83231c8d0cf58d148ebad0f6d62b00930aff2)
 
 Reine Implementierungshinweise, keine Architekturentscheidungen -- bei Widerspruch zum Contract oben gilt der
 Contract (Autoritaets-Hierarchie ADR-007).

@@ -4,52 +4,99 @@
   "title": "Standards (data/standards.json)",
   "type": "object",
   "required": ["version", "updated", "author", "assetTypes", "cables", "chargerTypes", "materials", "rules"],
+  "$defs": {
+    "slugId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Lowercase-kebab-case Slug, stabiler technischer Schluessel (ADR-006). Muss identisch mit dem Object-Key sein, unter dem der Eintrag gefuehrt wird."
+    },
+    "cableReference": {
+      "description": "Referenz auf eine konkrete Querschnitt-Variante eines Kabeltyps aus cables.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["cableId", "crossSection"],
+          "properties": {
+            "cableId": { "$ref": "#/$defs/slugId" },
+            "crossSection": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "crossSectionEntry": {
+      "type": "object",
+      "required": ["crossSection", "maxLength"],
+      "properties": {
+        "crossSection": { "type": ["string", "null"] },
+        "maxLength": { "type": ["number", "null"] }
+      }
+    }
+  },
   "properties": {
     "version": { "type": "string" },
     "updated": { "type": "string", "format": "date" },
     "author": { "type": "string" },
     "assetTypes": {
       "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slugId" },
       "additionalProperties": {
         "type": "object",
-        "required": ["name", "code", "color"],
+        "required": ["id", "code", "name", "color"],
         "properties": {
-          "name": { "type": "string" },
+          "id": { "$ref": "#/$defs/slugId" },
           "code": { "type": "string" },
+          "name": { "type": "string" },
           "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-          "defaultCable": { "type": ["string", "null"] },
+          "defaultCable": { "$ref": "#/$defs/cableReference" },
           "attributes": { "type": "object" }
         }
       }
     },
     "cables": {
+      "description": "Ein Eintrag pro Kabeltyp (Familie); einzelne Querschnitt-Varianten liegen im crossSections-Array (Entscheidung 2026-07-23, loest die in ADR-006 offen gelassene Strukturfrage).",
       "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slugId" },
       "additionalProperties": {
         "type": "object",
-        "required": ["category"],
+        "required": ["id", "code", "name", "category", "crossSections"],
         "properties": {
+          "id": { "$ref": "#/$defs/slugId" },
+          "code": { "type": "string" },
+          "name": { "type": "string" },
           "category": { "type": "string" },
-          "maxLength": { "type": ["number", "null"] }
+          "crossSections": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/crossSectionEntry" }
+          }
         }
       }
     },
     "chargerTypes": {
       "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slugId" },
       "additionalProperties": {
         "type": "object",
-        "required": ["powerKW", "defaultCable"],
+        "required": ["id", "code", "name", "powerKW", "defaultCable"],
         "properties": {
+          "id": { "$ref": "#/$defs/slugId" },
+          "code": { "type": "string" },
+          "name": { "type": "string" },
           "powerKW": { "type": "number" },
-          "defaultCable": { "type": "string" }
+          "defaultCable": { "$ref": "#/$defs/cableReference" }
         }
       }
     },
     "materials": {
       "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slugId" },
       "additionalProperties": {
         "type": "object",
-        "required": ["name", "unit"],
+        "required": ["id", "code", "name", "unit"],
         "properties": {
+          "id": { "$ref": "#/$defs/slugId" },
+          "code": { "type": "string" },
           "name": { "type": "string" },
           "unit": { "type": "string" }
         }
@@ -71,5 +118,5 @@
       }
     }
   },
-  "_status": "ENTWURF -- wird beim Architect-Lauf fuer Modul 2 final geprueft"
+  "_status": "FROZEN-ready -- final abgestimmt im Architect-Lauf fuer Modul 2 (2026-07-23), wartet auf contract.md STATUS FROZEN"
 }

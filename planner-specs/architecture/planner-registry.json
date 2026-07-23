@@ -28,7 +28,10 @@
         "planner/js/core/ProjectManager.js", "planner/js/core/Storage.js", "planner/js/core/main.js"
       ],
       "hash": "n/a",
-      "builtAgainstCommit": "n/a (vor Einführung von ADR-009 gebaut)"
+      "builtAgainstCommit": "n/a (vor Einführung von ADR-009 gebaut)",
+      "status": "FROZEN",
+      "frozenDate": "2026-07-23",
+      "frozenAtCommit": "d77d054"
     }
   ]
 }

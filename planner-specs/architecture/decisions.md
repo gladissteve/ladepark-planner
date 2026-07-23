@@ -31,45 +31,46 @@ Status: accepted
 Begründung: Ein Manifest zum Zeitpunkt der Prompt-Erzeugung beschreibt nur die Absicht, nicht die tatsächliche Umsetzung; erster Gemini-Audit-Durchlauf zeigte zudem, dass Auditor-Ergebnisse fehlerhaft sein können und vor Übernahme verifiziert werden müssen.
 
 # ADR-006
-Datum: 2026-07-22
-Entscheidungsvorschlag (Dirigent, zur Bestätigung durch den Projektverantwortlichen):
-Objekt-Keys in data/standards.json (assetTypes, cables, chargerTypes,
-materials) sind der jeweilige Grossschreibungs-Code des Eintrags (z. B.
-TRAFO, HPC, NYYJ, ABB_TERRA184) — kein zusätzlicher, separater
-lowercase-Slug.
-Status: proposed
-Begründung: planner-architecture.md benennt jeden Eintrag der
-Start-Bibliotheken bereits über sein "Code"-Feld (Code TRAFO, Code HPC,
-Code CAM, Code LEU) — der Code ist damit bereits der eindeutige, stabile
-Fachbezeichner. Ein zweiter, paralleler lowercase-Slug als Key wäre eine
-zusätzliche ID für dieselbe Sache. R14 verlangt ohnehin Zugriff nur über
-Getter (Standards.getAssetType(code)); Code == Key vermeidet eine
-zusätzliche Mapping-Ebene zwischen Aufrufer-Code und internem Key. Ein
-lauffähiger Präzedenzfall mit dieser Konvention liegt bereits im
-archivierten Prototyp vor (planner-specs/archive/standards-prototype-v0)
-— als Referenz, nicht als Übernahme-Grundlage.
+Datum: 2026-07-22 (Entscheidung bestätigt am 2026-07-23)
+Entscheidung: Interne technische IDs in data/standards.json (assetTypes,
+cables, chargerTypes, materials) sind stabile lowercase-kebab-case Slugs
+(z. B. id: "abb-terra-184"), getrennt vom Hersteller-/Fachcode (z. B.
+code: "ABB_TERRA_184") und vom Anzeigenamen (z. B. name: "Terra 184").
+id ist der stabile technische Schlüssel für Getter-Zugriffe (R14, z. B.
+Standards.getAssetType(id)); code und name sind eigene, unabhängig
+änderbare Felder, keine Aliase für id.
+Status: accepted
+Begründung: Projektverantwortlicher-Entscheidung vom 2026-07-23. Trennung
+von technischem Schlüssel, Hersteller-/Fachcode und Anzeigename
+vermeidet, dass eine spätere Änderung an Schreibweise/Groß-
+Kleinschreibung des Codes oder des Anzeigenamens einen bereits
+referenzierten Schlüssel bricht.
 Nicht Gegenstand dieses ADR: die strukturelle Frage "ein Eintrag pro
 Kabeltyp mit crossSections-Array" vs. "ein Eintrag pro Querschnitt-
 Variante" bei cables — das bleibt offener Punkt für den Architect-Lauf
 zu Modul 2 selbst.
 
+Historie (ursprünglicher Vorschlag vom 2026-07-22, verworfen, nie
+umgesetzt): Objekt-Keys sollten der jeweilige Grossschreibungs-Code des
+Eintrags sein (z. B. TRAFO, HPC, NYYJ, ABB_TERRA184), ohne zusätzlichen
+separaten lowercase-Slug. Ersetzt durch die obige Entscheidung.
+
 # ADR-010
-Datum: 2026-07-22
-Entscheidungsvorschlag (Dirigent, zur Bestätigung durch den Projektverantwortlichen):
-Core (v1.0.0) wird formal als FROZEN markiert (analog zur
+Datum: 2026-07-22 (Entscheidung bestätigt am 2026-07-23)
+Entscheidung: Core (v1.0.0) wird formal als FROZEN markiert (analog zur
 contract.md-Konvention aus module-lifecycle.md, auch ohne nachträglich
-angelegtes modules/core/contract.md, siehe MIGRATION.md). Dazu werden im
-Core-Eintrag von architecture/planner-registry.json die Felder
-frozenDate und frozenAtCommit ergänzt.
-Status: proposed
+angelegtes modules/core/contract.md, siehe MIGRATION.md). Im Core-Eintrag
+von architecture/planner-registry.json werden die Felder frozenDate
+(2026-07-23) und frozenAtCommit (d77d054) ergänzt.
+Status: accepted
 Begründung: Der Decision Gate für jedes Folgemodul (module-lifecycle.md,
 Schritt 0) verlangt "Alle Requires-Abhängigkeiten in der Registry
 FROZEN". Core ist Requires für praktisch jedes künftige Modul; eine
 explizite Freeze-Markierung beseitigt jede Unklarheit, ob Core noch
 änderbar ist, bevor der Architect-Lauf für Modul 2 beginnt.
-Offener Punkt: aus dem gelieferten Repo-Snapshot liegt kein Commit-Hash
-vor (kein .git enthalten). frozenAtCommit bleibt "n/a (Hash ausstehend)",
-bis der tatsächliche Commit-Hash des aktuellen main-Standes genannt wird.
+Frozen-Referenz: frozenAtCommit d77d054 (main-Stand zum Zeitpunkt der
+Bestätigung), frozenDate 2026-07-23. Ab diesem Zeitpunkt sind Änderungen
+an Core nur noch über eine neue ADR zulässig, kein stilles Editieren.
 
 # ADR-007
 Datum: 2026-07-22

@@ -37,12 +37,21 @@ zur Aufnahme in die Registry. Kein Schritt wird uebersprungen.
    Creates/Modifies/Deletes).
 8. Tests/Smoke-Test durch den Projektverantwortlichen (z. B. lokaler
    Server-Start, Konsole pruefen).
-9. Auditor prueft fertigen Code gegen Architektur + Registry + Contract,
-   erzeugt ein Manifest (nach templates/auditor-prompt.md) -- inklusive
-   Pruefung, ob der Manifest-Eintrag in module-manifest.js (R18) tatsaechlich
-   vorhanden und korrekt ist (siehe ADR-008: Registry- vs. Runtime-Sicht),
-   und inklusive dem Commit-Hash, gegen den gebaut wurde. Jeder Befund
-   braucht einen reproduzierbaren Beleg aus dem echten Code.
+9. Bevor der Auditor startet: module-prompts/<name>-audit-request.md wird
+   materialisiert (nach templates/auditor-prompt.md), analog zum
+   Builder-Snapshot aus Schritt 6 -- vollstaendig eingebettete R1-R19,
+   Contract inkl. Abnahmekriterien, vollstaendiger Code aller im Contract
+   genannten Dateien, Build-Commit-Hash und sha256 des verwendeten
+   Builder-Snapshots. Der Auditor liest ausschliesslich diese eine Datei
+   als Referenzmaterial (plus den tatsaechlichen Code im Repo als
+   Pruefgegenstand). Der Auditor prueft fertigen Code gegen Architektur +
+   Registry + Contract, bewertet jedes Abnahmekriterium einzeln
+   (PASS/FAIL mit woertlichem Beleg), und erzeugt ein Manifest --
+   inklusive Pruefung, ob der Manifest-Eintrag in module-manifest.js (R18)
+   tatsaechlich vorhanden und korrekt ist (siehe ADR-008: Registry- vs.
+   Runtime-Sicht). Jeder Befund braucht einen reproduzierbaren Beleg aus
+   dem echten Code -- ein Befund ohne Beleg ("entspricht vermutlich der
+   Architektur") wird verworfen, nicht gemeldet.
 10. Mensch bestaetigt das vorgeschlagene Manifest (oder verlangt
     Korrekturen -- zurueck zu Schritt 7/9, je nachdem was betroffen ist).
 11. Registry-Update -- architecture/planner-registry.json wird per

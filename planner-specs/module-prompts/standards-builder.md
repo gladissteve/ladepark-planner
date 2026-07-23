@@ -11,19 +11,19 @@ contractFrozenDate: 2026-07-23
 
 inputFiles:
   - path: planner-specs/architecture/planner-architecture.md
-    sha256: c033ad7cb675523d78cdb85ed13593d287ccb7b964cb2e4c7d7e1c9e86965d0
+    sha256: c033ad7cb675523d78cdb85ed13593d287ccb7b964cb2e4c7d7e1c9e86965d01
   - path: planner-specs/architecture/planner-registry.json
-    sha256: d1c90ffd50f5dc797059852b8d5ee6b7002850702550dcb67874f613e58b735
+    sha256: d1c90ffd50f5dc797059852b8d5ee6b7002850702550dcb67874f613e58b7350
   - path: planner-specs/architecture/decisions.md
-    sha256: 8c13f393e6f7f1242afad36106a86f6a2f4650100bfb38bba73c61f1f3beeed
+    sha256: 8c13f393e6f7f1242afad36106a86f6a2f4650100bfb38bba73c61f1f3beeed9
   - path: planner-specs/modules/standards/contract.md
-    sha256: 9f2bd73e439017dd758b129bde304901ed43cff87abbafc7654cc0f95f93cbf
+    sha256: 4fff7de03ce25bd9dc1e719398d776ce0453f665f250abd8f0733a13aac89dcd
   - path: planner-specs/modules/standards/schema.json
-    sha256: 46542ec13bdf41a65b28e5537d6d2706c8f2c6a0a8321b3049aebd9e4cb7f7c
+    sha256: 46542ec13bdf41a65b28e5537d6d2706c8f2c6a0a8321b3049aebd9e4cb7f7c9
   - path: planner-specs/modules/standards/seed-data.json
-    sha256: 2a31192121d01af002b5d55c08d062621fb3905fb47e85b55bd4702b452875
+    sha256: 2a31192121d01af002b5d55c08d062621fb3905fb47e85b55bd4702b45287570
   - path: planner-specs/modules/standards/notes.md
-    sha256: 5de4829b0e43effce8957a74827391d62299c28d028def37063be45cf8df514
+    sha256: 5de4829b0e43effce8957a74827391d62299c28d028def37063be45cf8df5145
 
 HINWEIS zum Abgleich Commit vs. Hash (aktualisiert 2026-07-23): Der
 fruehere Stand dieses Snapshots war gegen d77d054 materialisiert, obwohl

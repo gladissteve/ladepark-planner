@@ -1050,3 +1050,118 @@ Datei, keine neue Registry):
   2026-07-24.
 
 Ein Builder, der eine "proposed"-Entscheidung stillschweigend umsetzt, handelt außerhalb seines Mandats.
+
+# ADR-021
+Datum: 2026-07-24 (Architect-Sonderauftrag "modules/core/contract.md
+rückwirkend erstellen", Rückfrage zu Anwendungscode-Zugriff während
+dieser Session)
+
+Hinweis zur Nummerierung: Die Nummer "ADR-021" wurde bei ADR-020 oben
+("Kein ADR-021") ausdrücklich nicht vergeben, weil die dort diskutierten
+Entwürfe in ADR-020 aufgingen. Diese ADR ist inhaltlich unabhängig davon
+und die erste tatsächliche Verwendung der Nummer 021.
+
+Entscheidung: Ausnahme für Architect-Lesezugriff auf gefrorene
+Implementierungsartefakte, formuliert und vorgegeben vom
+Projektverantwortlichen auf ausdrückliche Rückfrage während dieser
+Session (2026-07-24):
+
+"Ausnahme: retrospektive Dokumentation gefrorener Artefakte
+
+Der Architect darf ausnahmsweise lesend auf gefrorene
+Implementierungsartefakte zugreifen, wenn dies ausschließlich der
+nachträglichen Erstellung oder Vervollständigung einer bereits
+existierenden Dokumentationsgrundlage dient (z. B. Contract-Erstellung
+für einen bestehenden Freeze-Stand).
+
+Diese Ausnahme gilt nur unter folgenden Bedingungen:
+
+- kein Schreiben oder Ändern von Anwendungscode
+- keine Ableitung neuer Implementierungsentscheidungen
+- keine Bewertung oder Freigabe des Implementierungszustands
+- Bezug ausschließlich auf einen eindeutig benannten Commit/Freeze-Stand
+- der Zugriff dient der Dokumentation eines bestehenden Zustands, nicht
+  der Entwicklung eines zukünftigen Zustands
+
+Änderungen am Code bleiben ausschließlich Aufgabe des Builders."
+
+Status: accepted
+
+Bestätigt am 2026-07-24 durch den Projektverantwortlichen: wörtlich
+erklärt "ADR-021 AKZEPTIERT" auf ausdrückliche Rückfrage dieser Session,
+gegen den oben benannten, committeten Stand (HEAD 937570a1778fc487c33
+dd3d736caf454838daecd). Damit gilt ADR-021 ab jetzt als "accepted";
+Architect darf im Rahmen des Geltungsbereichs oben lesend auf den
+Core-Code (planner/js/core/*, planner/index.html, planner/css/main.css)
+gegen diesen Commit zugreifen.
+
+Begründung: roles/architect.md verbietet unter "Verbotene Aktionen"
+explizit jeden Zugriff auf Anwendungscode (planner/js/**, planner/css/**,
+planner/index.html, planner/data/**) und untersagt Architect zugleich
+jede Entscheidung "im Vorbeigehen". Der Sonderauftrag "modules/core/
+contract.md rückwirkend erstellen" (Core FROZEN seit ADR-010, Commit
+d77d054, nie durch den heutigen Contract-/Audit-Prozess gelaufen) lässt
+sich ohne Lesezugriff auf den bereits eingefrorenen Core-Code nicht
+erfüllen. Statt dies selbst zu entscheiden, wurde die Frage als
+Rückfrage an den Projektverantwortlichen gestellt (vermittelt über
+einen Advisor-Prompt dieser Session); die oben zitierte, eng gefasste
+Formulierung stammt wörtlich von ihm.
+
+Geltungsbereich: ausschließlich dieser Sonderauftrag (rückwirkende
+Core-Contract-Erstellung). Kein Präzedenzfall für laufende oder
+künftige Module; gilt nicht für noch nicht eingefrorenen Anwendungscode.
+
+Bezugs-Commit für den Lesezugriff: HEAD 937570a1778fc487c33dd3d736
+caf454838daecd. In dieser Session wurde geprüft, dass der Arbeitsstand
+zu diesem HEAD inhaltlich identisch ist (git diff zeigt ausschließlich
+Dateimodus-Änderungen 100644->100755 bei identischen Blob-Hashes, 0
+Insertions/0 Deletions über alle 66 betroffenen Dateien) -- gelesen wird
+daher gegen diesen benannten Commit.
+
+Noch offen: Freigabe (Status -> accepted) durch den Projektverantwort-
+lichen, gemäß Status-Semantik oben nur gegen einen benannten,
+committeten Stand -- hier bereits erfüllt (HEAD 937570a1..., s. o.).
+
+Bestätigt am 2026-07-24 durch den Projektverantwortlichen: wörtlich
+erklärt "ADR-021 AKZEPTIERT" auf ausdrückliche Rückfrage dieser Session,
+gegen den oben benannten, committeten Stand (HEAD 937570a1778fc487c33
+dd3d736caf454838daecd). Damit gilt ADR-021 ab jetzt als "accepted";
+Architect darf im Rahmen des Geltungsbereichs oben lesend auf den
+Core-Code (planner/js/core/*, planner/index.html, planner/css/main.css)
+gegen diesen Commit zugreifen.
+
+# ADR-022
+Datum: 2026-07-24 (Architect-Sonderauftrag "modules/core/contract.md
+rückwirkend erstellen", Folgefrage aus der Bounded-Context-Prüfung von
+planner/css/main.css gegen R15)
+
+Entscheidung (Vorschlag): R15 wird um eine CSS-Zuordnung ergänzt:
+künftige Feature-Module erhalten perspektivisch einen eigenen
+CSS-Geltungsbereich, analog zur bestehenden js/<modul>/*-Aufzählung in
+R15. Der konkrete Lade-/Einbindungsmechanismus (z. B. wie ein
+Feature-Modul eigenes CSS einbindet, ohne index.html strukturell je
+Modul zu ändern, was R15 explizit verbietet) wird durch diese ADR NICHT
+festgelegt -- das ist ein eigener, gesondert zu klärender Punkt, hier
+bewusst nicht vorweggenommen (keine Entscheidung im Vorbeigehen).
+
+Status: proposed
+
+Begründung: Bei der rückwirkenden Erstellung von
+modules/core/contract.md wurde festgestellt, dass R15 Bounded Contexts
+ausschließlich für js/<modul>/*-Verzeichnisse aufzählt (plus die
+gesondert geregelten Sonderfälle index.html und module-manifest.js);
+css/ fehlt vollständig. planner/css/main.css wurde faktisch von Core
+angelegt, ohne dass R15 dafür eine Regel vorsieht. Auf Rückfrage
+entschied der Projektverantwortliche: künftige Feature-Module sollen
+perspektivisch eigenes CSS erhalten (nicht: CSS bleibt dauerhaft
+exklusiv Core).
+
+Geltungsbereich: betrifft ausschließlich künftige Feature-Module.
+planner/css/main.css bleibt bis auf Weiteres Cores Bounded Context
+(siehe modules/core/contract.md) -- diese ADR ändert daran nichts
+rückwirkend.
+
+Noch offen: (1) Wortlaut-Änderung an R15 selbst in
+planner-architecture.md erst nach Annahme dieser ADR, kein stilles
+Editieren. (2) Konkreter Einbindungsmechanismus für modul-eigenes CSS
+(eigener, gesondert zu klärender Punkt, nicht Teil dieser Entscheidung).

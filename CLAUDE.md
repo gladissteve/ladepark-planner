@@ -17,24 +17,52 @@ roles/README.md, Abschnitt "Warum dieser Ordner existiert").
 
 ## Session-Start
 
-Jede neue Claude-Code-Session in diesem Repository beginnt mit GENAU
-einem der folgenden Befehle:
+Seit ADR-017 (siehe planner-specs/architecture/decisions.md) ist der
+primaere Einstieg die native Skill-Struktur unter .claude/skills/, nicht
+mehr die Command-Struktur unter .claude/commands/ (letztere bleibt aus
+Registry-Konsistenzgruenden zusaetzlich bestehen, siehe role-registry.json,
+Feld commandFile). Skills sind keine zweite Wissensquelle -- sie enthalten
+ausschliesslich Einstieg, Rollenaktivierung und Verweise auf
+planner-specs/; die einzige fachliche Quelle bleibt planner-specs/.
+
+Zwei rollenneutrale Skills koennen jederzeit vorab oder unabhaengig
+verwendet werden, ohne eine Rolle festzulegen:
+
+- /kickoff -- reiner Statusbericht (Git-Stand, Architekturstatus,
+  Registrystatus, naechster Schritt), nur lesend, keine
+  Architekturentscheidung.
+- /advisor -- Architektur-Sparringspartner (Ideen, Alternativen,
+  Risiken, Trade-offs), schreibt nie Projektartefakte.
+
+Jede Session, die sich auf eine Rolle festlegt, beginnt mit GENAU einem
+der folgenden Skills bzw. gleichnamigen Befehle:
 
 - /architect
 - /builder
 - /auditor
-- /dirigent
 
-Diese Befehle sind unter .claude/commands/ hinterlegt und laden die
-vollstaendige, dauerhafte Rollendefinition aus planner-specs/
-architecture/roles/<rolle>.md. Ab diesem Zeitpunkt gilt fuer den Rest
-der Session ausschliesslich diese eine Rollendefinition — kein
-Rueckgriff auf diese CLAUDE.md-Rollenzuweisung (es gibt keine), keine
-andere Rollendatei.
+Diese laden die vollstaendige, dauerhafte Rollendefinition aus
+planner-specs/architecture/roles/<rolle>.md. Ab diesem Zeitpunkt gilt
+fuer den Rest der Session ausschliesslich diese eine Rollendefinition —
+kein Rueckgriff auf diese CLAUDE.md-Rollenzuweisung (es gibt keine),
+keine andere Rollendatei.
 
-Beginnt eine Session ohne einen dieser Befehle, oder wird die Rolle
-sonst nicht eindeutig genannt: keine Aktion, stattdessen Rueckfrage,
-welche Rolle gilt. Es gibt keine Standardrolle.
+Die vierte, urspruenglich mit ADR-011 eingefuehrte Rolle Dirigent ist
+seit ADR-017 deprecated und nicht mehr Teil des Standard-Workflows
+(siehe planner-specs/architecture/roles/dirigent.md); ihre frueheren
+Aufgaben sind auf /kickoff, /advisor und eine erweiterte
+Auditor-Phase-2-Session verteilt.
+
+Beginnt eine rollenfestlegende Session ohne einen dieser Skills/Befehle,
+oder wird die Rolle sonst nicht eindeutig genannt: keine Aktion,
+stattdessen Rueckfrage, welche Rolle gilt. Es gibt keine Standardrolle.
+
+## Standardablauf
+
+/kickoff → /advisor (optional) → /architect → /builder → /auditor →
+Commit → Push (Projektverantwortlicher). Details und Begruendung:
+planner-specs/architecture/roles/README.md, Abschnitt "Ablauf", und
+ADR-017.
 
 ## Rollenwechsel
 

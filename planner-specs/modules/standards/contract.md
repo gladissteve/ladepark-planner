@@ -13,17 +13,27 @@ tatsaechlich eingefrorenen Contract-Inhalt traegt,
 specification"). Core selbst bleibt bei frozenAtCommit d77d054.
 
 Contract-Korrektur (Architect, 2026-07-23, siehe ADR-012 in
-architecture/decisions.md, Status: proposed -- Bestaetigung durch den
-Projektverantwortlichen steht noch aus): Abschnitt "Abnahmekriterien"
+architecture/decisions.md, Status: accepted): Abschnitt "Abnahmekriterien"
 widersprach R18 und dem eigenen Abschnitt "Datenladen" (beide definieren
 main.js mit exportierter init()-Funktion, keine Methode
 Standards.init()). Reine Formulierungskorrektur, keine Architektur- oder
 Public-API-Aenderung. Version entsprechend auf 1.0.1 angehoben.
 
+Contract-Korrektur (Architect, 2026-07-24, siehe ADR-014 in
+architecture/decisions.md, Status: accepted): der Klammerzusatz zur
+ADR-012-Referenz im obigen Absatz war veraltet (nannte "Status:
+proposed -- Bestaetigung durch den Projektverantwortlichen steht noch
+aus", obwohl architecture/decisions.md ADR-012 gemaess ADR-007
+(hoechste Autoritaetsstufe) bereits als "Status: accepted" fuehrt) und
+wurde entsprechend auf "Status: accepted" korrigiert. Reine
+Statusangaben-Korrektur, keine Aenderung an Public API,
+Abnahmekriterien, Registry oder Anwendungscode. Version entsprechend
+von 1.0.1 auf 1.0.2 angehoben.
+
 ## Header
 
 - **Module**: Standards
-- **Version**: 1.0.1
+- **Version**: 1.0.2
 - **Requires**: Core >=1.0.0 (FROZEN, siehe architecture/planner-registry.json, frozenAtCommit d77d054)
 - **Registry-Key (R18)**: standards
 - **Creates**:

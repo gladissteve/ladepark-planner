@@ -68,9 +68,9 @@
       ],
       "hash": "ba3b3e108c366034beae652b3200663d894a25938fead38c288d2ac995200aea",
       "builtAgainstCommit": "OFFEN (uncommitted, siehe Audit-Request-Header)",
-      "status": "REVIEW",
-      "frozenDate": "n/a",
-      "frozenAtCommit": "n/a"
+      "status": "FROZEN",
+      "frozenDate": "2026-07-24",
+      "frozenAtCommit": "688f1829ad92f64734de20c918abd53d8f165268"
     }
   ]
 }

@@ -1,6 +1,32 @@
-STATUS: REVIEW
-addedDate: 2026-07-23
-Teil von: ADR-011 (siehe architecture/decisions.md)
+STATUS: DEPRECATED (proposed, siehe ADR-017 in architecture/decisions.md)
+addedDate: 2026-07-23 / deprecatedDate: 2026-07-24
+Teil von: ADR-011 (Einfuehrung), ADR-017 (Deprecation)
+
+**Diese Rolle ist nicht mehr Teil des Standard-Workflows.** Der neue
+Standardablauf ist /kickoff -> /advisor (optional) -> /architect ->
+/builder -> /auditor (siehe architecture/roles/README.md, ADR-017). Die
+frueheren Dirigenten-Aufgaben sind jetzt so abgedeckt: Lifecycle-Stand
+ermitteln/naechste Rolle benennen -> /kickoff (reines Lesen); offene
+fachliche Abwaegung -> /advisor; Confirmation-Datei materialisieren und
+Registry schreiben -> direkt in der Auditor-Phase-2-Session (module-
+lifecycle.md Schritt 10-11); role-registry.json um eine neue Rolle
+erweitern -> Architect unter explizitem Rollenarchitektur-Auftrag
+(bereits vorher erlaubt, siehe architecture/roles/architect.md).
+
+Diese Datei und der Registry-Eintrag in architecture/role-registry.json
+bleiben unveraendert erhalten (Registry ist append-only, kein Loeschen/
+Aendern bestehender Eintraege) -- ausschliesslich aus Nachvollzieh-
+barkeits- und Konsistenzgruenden. "DEPRECATED" bedeutet hier ausdruecklich
+"ersetzt/archiviert", nicht "abgeschafft": die Prozess-Orchestrierungs-
+Funktion, die Dirigent historisch hatte, kann bei kuenftigem Bedarf
+(z. B. Planung mehrerer Module, Optimierung der Build-Reihenfolge,
+uebergreifende Fortschrittsueberwachung) als neue, eigene Rolle ueber den
+additiven Erweiterungsmechanismus (architecture/roles/README.md) wieder
+eingefuehrt werden -- nicht durch Reaktivierung dieser Datei, siehe
+ADR-017, Punkt 2. Der Rest dieser Datei beschreibt die Rolle, wie sie
+bis zur Ersetzung galt (Referenz/Historie, keine aktive Anleitung mehr):
+
+---
 
 Diese Datei ist eine der vier dauerhaften Rollendefinitionen dieses
 Projekts (siehe architecture/role-registry.json fuer die vollstaendige

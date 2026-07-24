@@ -6,7 +6,7 @@ R1  Datengetrieben: keine Anlagentypen/Kabeltypen/Zuordnungen/Regeln hart im Cod
 R2  Anlage strikt getrennt von Material; Material wird nur über Regeln abgeleitet, nie direkt zugewiesen
 R3  Regeln sind deklarativ {field, op, value, severity, message}, niemals eval()/new Function() auf Strings
 R4  Standards sind versioniert (version, updated, author); Module referenzieren eine Versionsnummer, nie "die aktuellen Werte"
-R5  Karte (GIS) ist reine Darstellung: liest nur Projekt→Assets (Marker) und Projekt→Kabel (Polyline), keine Fachlogik/Validierung in der Karte
+R5  Karte (GIS) ist reine Darstellung: liest UND verwaltet Projekt→Layer (Sichtbarkeit/Reihenfolge von Assets-/Kabel-Gruppen), zusätzlich zu Projekt→Assets (Marker) und Projekt→Kabel (Polyline), keine Fachlogik/Validierung in der Karte (redaktionelle Präzisierung gemäß ADR-015, kein neuer Regelinhalt)
 R6  Mengenermittlung ist reine Aggregation ohne eigene Regeln, sammelt nur vorhandenes Material/Kabel aus dem Projekt
 R7  Ordnerstruktur fix: planner/index.html, css/, js/, data/, projects/
 R8  Projektmodell-Baum fix: Projekt → Einstellungen, Standards, Layer, Anlagen, Kabel, Trassen, Materialien, Version
@@ -52,22 +52,71 @@ R19 Zugriff auf die in der Registry verwalteten Core-Singleton-Instanzen (aktuel
     verboten. Reine Konstanten- und Utility-Exporte aus Core (z. B. CORE_EVENTS, DOM) sind davon nicht
     betroffen und dürfen normal importiert werden
 
+## Zuordnung R8-Baumzweige zu Modulen (ADR-015, bestätigt 2026-07-24)
+
+R8 nennt Layer, Trassen und Materialien als eigene Zweige des
+Projektmodell-Baums, ohne ein zuständiges Modul zu benennen. Bestätigte
+Zuordnung (dokumentierend, erzeugt keine neue Regel, ändert R1-R19 nicht
+außer der oben bei R5 vermerkten redaktionellen Präzisierung):
+
+- **Layer** → GIS-Modul (js/gis/*). Reine Darstellungs-/
+  Gruppierungsmetadaten (z. B. {id, name, visible, order}) für die
+  Kartendarstellung, siehe präzisiertes R5.
+- **Trassen** → Kabeleditor-Modul (js/cable-editor/*), nicht das
+  Kabelsystem-Modul. Kabel referenzieren eine Trasse ausschließlich über
+  ihr bestehendes conduit-Feld (Fremdschlüssel auf Trasse.id, R9);
+  Kabelsystem verwaltet keine Trassen-Geometrie selbst.
+- **Materialien** (Projekt-Zweig, zu unterscheiden von
+  Standards.materials als Katalog) → gemeinsam von Asset-System und
+  Kabelsystem geschrieben. Jedes der beiden Module leitet das Material
+  seiner eigenen Objekte über Standards.validate(...)/Standards-Regeln
+  ab (R2) und schreibt es nach Projekt→Materialien; Mengenermittlung
+  liest diesen Zweig ausschließlich lesend/aggregierend (R6).
+
+Details und Begründung: architecture/decisions.md, ADR-015.
+
+## R12-Klarstellung für Feature-Module (ADR-016, bestätigt 2026-07-24)
+
+Präzisierung der Zuständigkeit unter R12, ohne Änderung des R12-Wortlauts:
+
+- Es gibt genau EINE projektweite schemaVersion (Core.
+  CURRENT_SCHEMA_VERSION), keinen pro-Modul-Versionszähler.
+- migrateProject bleibt zentral in Storage/ProjectManager (Core) als
+  EINE aufrufbare Funktion/Einstiegspunkt. Ändert ein Feature-Modul die
+  Struktur seines eigenen Teilbaums, liefert dieses Modul dafür den
+  nötigen Migrationsschritt als eigene, vom zentralen migrateProject
+  aufgerufene Teilfunktion und stößt eine Erhöhung der projektweiten
+  CURRENT_SCHEMA_VERSION an (koordiniert über eine ADR) — das Modul hält
+  selbst keine eigene, parallele schemaVersion.
+- Module ohne Projektdaten-Persistenz (aktuell: Standards) bleiben
+  unverändert ausgenommen.
+
+Details und Begründung: architecture/decisions.md, ADR-016. Keine
+Codeänderung durch diese Klarstellung.
+
 ## Rollentrennung
 
-Vier dauerhafte Rollen, jede mit eigener, vollständig in sich
-geschlossener Rollendefinition unter architecture/roles/ (verbindliche
-Liste in architecture/role-registry.json, Gesamtüberblick inkl.
+Drei dauerhafte Rollen (Architect, Builder, Auditor), jede mit eigener,
+vollständig in sich geschlossener Rollendefinition unter
+architecture/roles/ (verbindliche Liste in
+architecture/role-registry.json, Gesamtüberblick inkl.
 Zustandsdiagramm in architecture/roles/README.md; Session-Start je
-Rolle über die Befehle /architect, /builder, /auditor, /dirigent, siehe
-CLAUDE.md). Diese kompakte Übersicht hier ersetzt nicht die
+Rolle über die Skills bzw. gleichnamigen Befehle /architect, /builder,
+/auditor, siehe CLAUDE.md). Ergänzend zwei rollenneutrale
+Einstiegs-Skills ohne eigenen Registry-Eintrag: /kickoff (reiner
+Statusbericht, nur lesend) und /advisor (Architektur-Sparringspartner,
+schreibt keine Projektartefakte). Die vierte, ursprünglich mit ADR-011
+eingeführte Rolle Dirigent ist seit ADR-017 deprecated (ihre Aufgaben
+sind auf /kickoff, /advisor und eine erweiterte Auditor-Phase-2
+verteilt); Details: ADR-017, architecture/roles/dirigent.md. Diese
+kompakte Übersicht hier ersetzt nicht die
 Detaildefinition in den einzelnen Rollendateien — bei Widerspruch gilt
 die jeweilige Rollendatei als Detailquelle, R1–R19 in diesem Dokument
 bleiben in jedem Fall übergeordnet (siehe ADR-011).
 
-- **Architect**: kennt Architektur + Registry + Modul-Contract, verhandelt Contracts, erzeugt Builder-Snapshot und (nach Builder-Abschluss) Audit-Request, schreibt niemals Registry oder Anwendungscode.
+- **Architect**: kennt Architektur + Registry + Modul-Contract, verhandelt Contracts, erzeugt Builder-Snapshot und (nach Builder-Abschluss) Audit-Request, schreibt niemals Registry oder Anwendungscode. Haengt unter explizitem Rollenarchitektur-Auftrag auch neue Eintraege in role-registry.json an (seit ADR-017 die einzige Rolle mit diesem Schreibzugriff).
 - **Builder**: kennt ausschließlich den ihm übergebenen Builder-Snapshot, liefert Produktionscode innerhalb des Bounded Context, kein Schreibzugriff auf Registry/Architektur/Contract, darf nie die eigene Arbeit abnehmen.
-- **Auditor**: kennt Architektur + Registry + fertigen Code + Audit-Request, prüft Konsistenz, erzeugt Manifest-Vorschlag; schreibt planner-registry.json (nur in einer zweiten, eigenen Session, ausschließlich auf Basis einer vom Dirigenten materialisierten, menschlich bestätigten Confirmation-Datei — siehe ADR-005, ADR-011).
-- **Dirigent**: orchestriert den Ablauf zwischen den Rollen, holt die menschliche Bestätigung zu einem Manifest-Vorschlag ein und materialisiert daraus die Confirmation-Datei für den Auditor, ist die einzige Rolle mit Schreibzugriff auf role-registry.json (ausschließlich Anhängen neuer Rollen), trifft selbst keine fachlichen Architekturentscheidungen und schreibt planner-registry.json nie selbst.
+- **Auditor**: kennt Architektur + Registry + fertigen Code + Audit-Request, prüft Konsistenz, erzeugt Manifest-Vorschlag; schreibt planner-registry.json in einer zweiten, eigenen Session (Phase 2), die seit ADR-017 die menschliche Bestätigung direkt entgegennimmt und die Confirmation-Datei selbst materialisiert (zuvor: über den mittlerweile deprecateten Dirigenten, ADR-011).
 
 Jede Rolle gilt ausschließlich für eine Claude-Code-Session; ein
 Rollenwechsel innerhalb derselben Session ist nicht vorgesehen (das

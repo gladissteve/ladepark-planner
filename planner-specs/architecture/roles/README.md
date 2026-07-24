@@ -1,13 +1,25 @@
-STATUS: REVIEW (Teil von ADR-011, siehe architecture/decisions.md)
+STATUS: REVIEW (Teil von ADR-011, vereinfacht durch ADR-017 -- siehe
+architecture/decisions.md)
 
 # Rollenarchitektur
 
-Dieser Ordner enthaelt die vier dauerhaften, streng getrennten Rollen
-fuer Claude-Code-Sessions in diesem Projekt: Architect, Builder,
-Auditor, Dirigent. Jede Rolle ist eine eigene, vollstaendig in sich
-geschlossene Datei (architect.md, builder.md, auditor.md, dirigent.md).
-Die verbindliche Liste aller Rollen samt Verweis auf Rollendatei und
-Session-Startbefehl steht in architecture/role-registry.json.
+Dieser Ordner enthaelt die dauerhaften, streng getrennten Rollen fuer
+Claude-Code-Sessions in diesem Projekt: Architect, Builder, Auditor.
+Dirigent ist seit ADR-017 deprecated und nicht mehr Teil des
+Standard-Workflows (siehe dirigent.md und Abschnitt "Ablauf" unten) --
+die Datei bleibt aus Registry-Konsistenzgruenden erhalten. Jede aktive
+Rolle ist eine eigene, vollstaendig in sich geschlossene Datei
+(architect.md, builder.md, auditor.md). Die verbindliche Liste aller
+Rollen samt Verweis auf Rollendatei und Session-Startbefehl steht in
+architecture/role-registry.json (unveraendert durch ADR-017, append-
+only).
+
+Zusaetzlich gibt es seit ADR-017 zwei rollenneutrale Einstiegs-Skills,
+die bewusst NICHT in role-registry.json stehen, weil sie keine
+Artefakte im Sinne der Rollenarchitektur erzeugen: kickoff (reiner
+Statusbericht, nur lesend) und advisor (Architektur-Sparringspartner,
+schreibt nie Projektartefakte). Details: .claude/skills/kickoff/,
+.claude/skills/advisor/, ADR-017.
 
 ## Grundsatz: Trennung von Erzeugung und Bewertung (verbindlich fuer alle Rollen)
 
@@ -34,11 +46,12 @@ Pruefung dienen, bevor eine neue Ausnahme eingefuehrt wird. Konkret:
   bewusst als separate, spaetere Session definiert, die den bereits
   bestaetigten Inhalt nur noch uebernimmt, nicht neu bewertet (siehe
   architecture/roles/auditor.md).
-- **Dirigent** veraendert niemals fachliche Inhalte, sondern reicht sie
-  ausschliesslich weiter und steuert den Workflow -- deshalb
-  materialisiert er die Registry-Confirmation-Datei nur mit woertlich
-  uebernommenem, bereits bestaetigtem Inhalt, ohne eigene fachliche
-  Bewertung (siehe architecture/roles/dirigent.md).
+- **Dirigent** (deprecated seit ADR-017) veraenderte niemals fachliche
+  Inhalte, sondern reichte sie ausschliesslich weiter -- dasselbe
+  Prinzip gilt jetzt fuer die Auditor-Phase-2-Session, die die
+  Confirmation-Datei nur mit woertlich uebernommenem, bereits
+  bestaetigtem Inhalt materialisiert, ohne eigene fachliche Bewertung
+  (siehe architecture/roles/auditor.md, architecture/roles/dirigent.md).
 
 ## Warum dieser Ordner existiert
 
@@ -49,25 +62,34 @@ genutzt werden konnte, ohne CLAUDE.md jedes Mal manuell umzuschreiben --
 und ohne Garantie, dass eine solche Umschreibung nicht versehentlich
 Rollenwissen aus einem fruaeheren Chatverlauf uebernimmt. Die Loesung:
 CLAUDE.md selbst ist rollenneutral (siehe root-CLAUDE.md); die Rolle
-wird pro Session explizit und reproduzierbar ueber einen von vier festen
-Befehlen geladen (siehe "Session-Start" unten). Jede Rollendatei ist so
+wird pro Session explizit und reproduzierbar ueber einen der festen
+Rollen-Skills/-Befehle geladen (siehe "Session-Start" unten). Jede Rollendatei ist so
 geschrieben, dass sie ausschliesslich aus sich selbst heraus verstanden
 werden kann -- ohne Rueckgriff auf den Chatverlauf, in dem sie geladen
 wurde, und ohne Rueckgriff auf eine andere Rollendatei.
 
 ## Session-Start (reproduzierbar, unabhaengig vom Chatverlauf)
 
-Jede neue Claude-Code-Session beginnt mit GENAU einem der folgenden
-Befehle, hinterlegt unter .claude/commands/:
+Jede neue Claude-Code-Session, die sich auf eine Rolle festlegt, beginnt
+mit GENAU einem der folgenden Skills bzw. gleichnamigen Befehle
+(Befehle unter .claude/commands/ bleiben aus Registry-
+Konsistenzgruenden zusaetzlich bestehen, siehe ADR-017; Skills unter
+.claude/skills/ sind der empfohlene Einstieg):
 
-| Befehl      | Laedt                                    |
-|-------------|-------------------------------------------|
-| /architect  | architecture/roles/architect.md            |
-| /builder    | architecture/roles/builder.md               |
-| /auditor    | architecture/roles/auditor.md               |
-| /dirigent   | architecture/roles/dirigent.md              |
+| Skill/Befehl | Laedt                                    |
+|--------------|-------------------------------------------|
+| /architect   | architecture/roles/architect.md            |
+| /builder     | architecture/roles/builder.md               |
+| /auditor     | architecture/roles/auditor.md               |
 
-Jeder dieser Befehle ist absichtlich kurz und enthaelt selbst keine
+Davor bzw. unabhaengig davon koennen die rollenneutralen Skills
+/kickoff (Status, nur lesend) und /advisor (Diskussion, schreibt nichts)
+jederzeit verwendet werden, ohne dass damit eine Rolle im Sinne dieser
+Datei aktiviert wird -- siehe Abschnitt oben und ADR-017. /dirigent
+(architecture/roles/dirigent.md) ist deprecated (ADR-017) und wird fuer
+neue Sessions nicht mehr verwendet.
+
+Jeder dieser Rollen-Skills/-Befehle ist absichtlich kurz und enthaelt selbst keine
 Rollenlogik -- er weist ausschliesslich an, die vollstaendige
 Rollendatei zu lesen und ab sofort ausschliesslich danach zu arbeiten,
 und verlangt eine kurze Selbstauskunft (Rolle, Zweck in einem Satz,
@@ -98,15 +120,17 @@ Builder-Session zugreifen -- sie hat ausschliesslich module-prompts/
 
 ## Ablauf (Rollen-Zustandsdiagramm)
 
-Korrigiert am 2026-07-23 nach Rueckmeldung des Projektverantwortlichen:
-der Dirigent ist Koordinator, kein Qualitaetspruefer -- er schreibt die
-Registry nicht selbst. Der Auditor kennt Registry, Code und Findings
-und fuehrt den Schreibvorgang in einer zweiten, eigenen Session aus,
-nachdem der Dirigent die menschliche Bestaetigung eingeholt und dafuer
-eine Confirmation-Datei materialisiert hat.
+Vereinfacht durch ADR-017 (2026-07-24): Dirigent entfaellt. Status-
+Ermittlung uebernimmt der rollenneutrale Skill /kickoff (reines Lesen),
+die Confirmation-Datei materialisiert die Auditor-Phase-2-Session selbst
+direkt aus der Bestaetigung des Projektverantwortlichen, ohne
+zwischengeschalteten Rollenwechsel.
 
 ```
-Dirigent (Status pruefen)
+/kickoff (Status, nur lesend, keine Rolle)
+   |
+   v
+/advisor (optional, Diskussion, keine Rolle, schreibt nichts)
    |
    |  Decision Gate offen / Contract fehlt oder nicht FROZEN
    v
@@ -123,39 +147,40 @@ Architect (Audit-Request materialisieren)
    v
 Auditor Phase 1 (pruefen, Manifest-Vorschlag, "AUDIT <NAME> ABGESCHLOSSEN.")
    |
-   |  Mensch bestaetigt Manifest
+   |  Mensch bestaetigt Manifest (Datum + woertlicher Bezug)
    v
-Dirigent (Confirmation-Datei materialisieren, module-prompts/<name>-
-          registry-confirmation.md)
+Auditor Phase 2, neue Session (Confirmation-Datei materialisieren UND
+          Registry schreiben, "REGISTRY <NAME> AKTUALISIERT.")
    |
    v
-Auditor Phase 2, neue Session (Registry schreiben, "REGISTRY <NAME>
-          AKTUALISIERT.")
-   |
-   v
-Dirigent (naechstes Modul: zurueck zum Start) / Ende
+Commit -> Push (Projektverantwortlicher) / naechstes Modul: zurueck zu
+          /kickoff
 ```
 
 Bei Korrekturbedarf (Audit Phase 1 findet FAIL-Kriterien): zurueck zu
 Builder (Code-Korrektur) oder Architect (Contract war unklar/
-widerspruechlich), je nachdem, was der Befund betrifft -- der Dirigent
-entscheidet, welcher Ruecksprung zutrifft, benennt ihn aber nur, er
-fuehrt ihn nicht selbst aus.
+widerspruechlich), je nachdem, was der Befund betrifft -- das entscheidet
+der Projektverantwortliche anhand des Audit-Berichts (bzw. /advisor zur
+Einordnung), nicht mehr der Dirigent.
 
 ## Wie kuenftige Rollen erweitert werden, ohne bestehende Rollen anzupassen
 
 1. Eine neue Datei architecture/roles/<neue-rolle>.md anlegen, nach
-   derselben Struktur wie die vier bestehenden Dateien (Zweck,
-   Verantwortlichkeiten, Verbotene Taetigkeiten, Ein-/Ausgabeartefakte,
-   Lesen/Schreiben, Ende, Naechste Rolle). Bestehende Rollendateien
-   werden dabei nicht veraendert.
-2. Eine neue Datei .claude/commands/<neue-rolle>.md anlegen (gleiche
-   Struktur wie die vier bestehenden Befehle).
+   derselben schlanken Struktur wie die bestehenden aktiven Dateien
+   (Zweck, Verantwortung, Erlaubte Aktionen, Verbotene Aktionen,
+   Benoetigte Eingabeartefakte, Erwartete Ausgabe). Bestehende
+   Rollendateien werden dabei nicht veraendert.
+2. Eine neue Datei .claude/skills/<neue-rolle>/SKILL.md anlegen (gleiche
+   Struktur wie die bestehenden Skills: Einstieg, Rollenaktivierung,
+   Verweis auf die Rollendatei -- keine Kopie von Architekturregeln).
+   Optional zusaetzlich .claude/commands/<neue-rolle>.md aus Registry-
+   Konsistenzgruenden (siehe ADR-017).
 3. Genau einen neuen Eintrag in architecture/role-registry.json
-   anhaengen (ausschliesslich durch die Rolle Dirigent, siehe
-   architecture/roles/dirigent.md) -- niemals bestehende Eintraege
-   aendern, entfernen oder umsortieren. Dasselbe Anhaenge-Prinzip wie
-   bei R15/R18 fuer module-manifest.js.
+   anhaengen -- seit Dirigent-Deprecation (ADR-017) durch die Rolle
+   Architect unter explizitem Rollenarchitektur-Auftrag (siehe
+   architecture/roles/architect.md, Abschnitt "Verantwortung") --
+   niemals bestehende Eintraege aendern, entfernen oder umsortieren.
+   Dasselbe Anhaenge-Prinzip wie bei R15/R18 fuer module-manifest.js.
 4. Optional: in architecture/planner-architecture.md, Abschnitt
    "Rollentrennung", einen zusaetzlichen Stichpunkt fuer die neue Rolle
    ergaenzen -- die Detaildefinition bleibt aber ausschliesslich in der

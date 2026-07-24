@@ -196,6 +196,27 @@ vorangegangenen Session bereits vorgenommenen Änderungen an CLAUDE.md
 und an planner-architecture.md ("Rollentrennung") als verbindlich
 integriert.
 
+Ergänzung 2026-07-24 (Operationalisierung von "explizit und gesondert",
+Architect-Auftrag "Governance-Konsolidierung nach Audit ADR-019/020" --
+keine Änderung des ursprünglichen ADR-011-Entscheidungsinhalts, reine
+Präzisierung des vorstehenden Freigabe-Hinweises): "Explizit und
+gesondert" bedeutet konkret, dass eine gültige Freigabe durch den
+Projektverantwortlichen eine der folgenden zwei Formen haben muss:
+a) die betroffene ADR-Nummer wird selbst genannt und eindeutig
+akzeptiert (etabliertes Muster, siehe z. B. "ADR-006 AKZEPTIERT",
+"ADR-010 AKZEPTIERT", "ADR-014 AKZEPTIERT", "ADR-015 AKZEPTIERT",
+"ADR-016 AKZEPTIERT", "ADR-018 AKZEPTIERT"), oder
+b) der Projektverantwortliche beantwortet eine Rückfrage, die die
+betroffene ADR-Nummer bereits wörtlich enthält.
+Eine allgemeine Zustimmung zu einem Auftragstext oder eine allgemeine
+Ja-Antwort auf eine nicht nummerierte Rückfrage reicht dagegen NICHT
+aus. Diese Operationalisierung fasst eine bereits durchgängig
+angewandte Praxis (sechs von acht bislang bestätigten ADRs folgen
+bereits Form a) in Regelform, ohne eine neue Freigabevoraussetzung
+einzuführen. Vollständig und für alle ADRs verbindlich festgehalten in
+architecture/decisions.md, Abschnitt "Status-Semantik für diese
+Entscheidungen".
+
 Status-Pruefung (Architect, 2026-07-24, im Rahmen der Architektur-
 Revalidierung Baseline 688f182): ADR-011 steht weiterhin auf Status
 "proposed". In diesem Dokument ist keine explizite Bestaetigung des
@@ -835,10 +856,197 @@ geaendert wird (siehe Ablaufpunkte b-d oben) -- diese Bestaetigung liegt
 mit dem Vermerk oben nun vor; Ablaufpunkte c) und d) stehen weiterhin
 aus.
 
+# ADR-019
+Datum: 2026-07-24 (Architect-Umsetzungssession, im Anschluss an die
+Advisor-/Architect-Diskussion in Session "Ladepark-Planer
+Architekturprüfung" und die anschließende Konsistenzprüfung in Session
+"ADR-019/020 Konsistenzprüfung")
+Entscheidung: Einführung eines Vier-Schichten-Modells für Sessions
+dieses Projekts: Rolle -> Einstiegskanal -> Plattform -> Adapter-
+Zuordnung. Die vier Begriffe liegen auf unabhängig variierenden Achsen
+und dürfen nicht vermischt werden:
+
+- **Rolle** (Kickoff, Advisor sowie die vier Rollen aus architecture/
+  role-registry.json: Architect, Builder, Auditor, Dirigent) bleibt
+  plattformneutral -- eine Rolle definiert Zweck, Verantwortung,
+  erlaubte/verbotene Tätigkeiten, Ein-/Ausgabeartefakte (siehe
+  architecture/roles/*.md bzw. .claude/skills/kickoff/, .claude/
+  skills/advisor/), unabhängig davon, auf welcher Plattform oder über
+  welchen Kanal sie aktiviert wird.
+- **Einstiegskanal** (z. B. der Skill/Befehl /kickoff, /advisor,
+  /architect, /builder, /auditor, oder ein plattformneutraler Chattext,
+  der dieselbe Rolle eindeutig benennt) enthält selbst keinen
+  Rolleninhalt -- er ist ausschließlich der Auslöser, der auf die
+  vollständige Rollen-/Skilldatei verweist (siehe architecture/roles/
+  README.md, Abschnitt "Session-Start").
+- **Plattform** (z. B. Claude Desktop, Claude Code) ist keine
+  Eigenschaft einer Rolle, sondern die technische Umgebung, in der eine
+  Session läuft. Dieselbe Rolle kann grundsätzlich auf mehreren
+  Plattformen existieren; ob dafür aktuell ein technischer Adapter
+  existiert, regelt die Adapter-Zuordnung.
+- **Adapter-Zuordnung** ist eine eigene, separate Zuordnung (Tripel aus
+  Rolle x Plattform x Einstiegskanal), die festhält, ob für eine
+  gegebene Rolle auf einer gegebenen Plattform tatsächlich ein
+  technischer Adapter (Skill/Befehl/Text-Trigger) existiert. Sie ist
+  Gegenstand von ADR-020, nicht von ADR-019.
+
+Klarstellung: Prompt und Agent sind verwandte, nicht normative Begriffe
+und stellen keine zusätzlichen Schichten dar.
+
+Betroffene Dokumente (Vollzug in dieser Session): architecture/roles/
+README.md (neuer Grundsatzabschnitt, analog "Trennung von Erzeugung
+und Bewertung", plus Adapter-Zuordnungstabelle und
+Plattformkennzeichnung im bestehenden Ablaufdiagramm -- Gegenstand von
+ADR-020), CLAUDE.md (plattformneutraler Text-Trigger, Gegenstand von
+ADR-020), docs/Projekthandbuch.md (rein redaktionelle Präzisierung
+vermischter Plattform-/Rollenformulierungen). Keine Änderung an
+architecture/role-registry.json, R1-R19, Modul-Contracts oder der
+Modul-Registry.
+
+Status: accepted
+Begründung: architecture/roles/README.md (Abschnitt "Session-Start")
+bezeichnete den Sessionstart bislang durchgängig als
+"Claude-Code-Session", obwohl dieselben Rollen bzw. rollenneutralen
+Skills (insbesondere Kickoff und Advisor) auch auf Claude Desktop
+laufen (siehe docs/Projekthandbuch.md, Abschnitt 5, "Zwei
+unterschiedliche Claude-Umgebungen"). Ohne eine explizite Trennung der
+vier Begriffe bliebe unklar, ob z. B. ein fehlender Adapter für
+Architect auf Desktop eine Eigenschaft der Rolle Architect selbst ist
+oder nur ein aktuell fehlendes technisches Werkzeug -- genau das war
+der Ausgangspunkt der vorangegangenen Advisor-/Architect-Diskussion und
+der anschließenden Konsistenzprüfung.
+
+Bestätigt am 2026-07-24 durch den Projektverantwortlichen: Der
+Architect-Auftrag dieser Session nannte ADR-019/020 als bereits "durch
+den Projektverantwortlichen freigegebene Architekturentscheidungen"
+(Vorbedingung), ohne dass der Auftragstext selbst eine wörtliche
+Freigabe-Formulierung wie bei ADR-006/010/014/015/016/018 enthielt;
+zusätzlich hatte die unmittelbar vorangegangene Session "ADR-019/020
+Konsistenzprüfung" ausdrücklich festgehalten, dass der Status bis zu
+einer expliziten Bestätigung "proposed" bleiben muss und der Architect
+nie selbst auf "accepted" setzt. Diese Diskrepanz wurde daher nicht
+eigenmächtig aufgelöst, sondern dem Projektverantwortlichen als
+Rückfrage vorgelegt: ob dieser Auftrag selbst als förmliche Freigabe zu
+werten ist. Antwort: ja, dieser Auftrag ist die förmliche Freigabe.
+Damit gilt ADR-019 ab jetzt als "accepted"; Umsetzung erfolgt in
+derselben Session in architecture/roles/README.md.
+
+Nachbestätigung 2026-07-24 (im mit der ADR-011-Ergänzung vom 2026-07-24
+operationalisierten Muster, dortige Form a: ADR-Nummer selbst genannt
+und eindeutig akzeptiert): Der Projektverantwortliche hat wörtlich
+erklärt: "ADR-019 AKZEPTIERT. Datum: 2026-07-24." Diese Nachbestätigung
+ersetzt die vorstehende ursprüngliche Bestätigung nicht, sondern stellt
+zusätzlich fest, dass die Freigabe von ADR-019 auch der seither
+präzisierten Formanforderung genügt.
+
+# ADR-020
+Datum: 2026-07-24 (Architect-Umsetzungssession, unmittelbar im
+Anschluss an ADR-019; verschmilzt die ursprünglich getrennt
+diskutierten Entwürfe "ADR-020" und "ADR-021" zu einer gemeinsamen ADR,
+siehe Session "ADR-019/020 Konsistenzprüfung")
+Entscheidung: Konkrete Adapter-Zuordnung (ADR-019, Begriff
+"Adapter-Zuordnung") für Kickoff, Advisor sowie die vier Rollen aus
+architecture/role-registry.json, plus plattformübergreifende
+Klarstellungen für die Einstiegskanäle Kickoff und Advisor.
+
+1. **Adapter-Zuordnungstabelle** (Long-Format, eine Zeile je
+   Rolle x Plattform, statt einer Plattformspalte je Zeile -- trifft
+   die Tripel-Definition aus ADR-019 direkter als ein Wide-Format und
+   skaliert auf künftige Plattformen, ohne neue Spalten zu benötigen).
+
+   Werte für "Adapter vorhanden":
+   - **Ja** -- ein technischer Einstiegskanal (Skill/Befehl/
+     Text-Trigger) existiert auf dieser Plattform tatsächlich.
+   - **Nein, aktuell** -- kein Adapter vorhanden, aber technisch
+     grundsätzlich möglich; ein zeitlicher, jederzeit revidierbarer
+     Zustand, keine Eigenschaft der Rolle (ADR-019).
+   - **Nein, dauerhaft** -- für diese Rolle/Plattform-Kombination ist
+     bewusst kein Adapter vorgesehen.
+
+   | Rolle     | Plattform | Adapter vorhanden | Einstiegskanal | Begründung |
+   |-----------|-----------|--------------------|-----------------|------------|
+   | Kickoff   | Desktop   | Ja | plattformneutraler Text-Trigger "/kickoff" (Punkt 2 unten) | reiner Statusbericht, plattformneutral nutzbar |
+   | Kickoff   | Code      | Ja | .claude/skills/kickoff/, .claude/commands/kickoff.md | wie bisher (ADR-017) |
+   | Advisor   | Desktop   | Ja | plattformneutraler Text-Trigger "/advisor" (Punkt 2 unten) | reiner Denkraum, schreibt nie -- keine Dopplung, da nur eine Advisor-Instanz existiert (Konsistenzprüfung, Punkt 4) |
+   | Advisor   | Code      | Ja | .claude/skills/advisor/, .claude/commands/advisor.md | wie bisher (ADR-017) |
+   | Architect | Desktop   | Nein, aktuell | -- | kein technischer Adapter auf Desktop vorhanden; zeitlicher Zustand, kein Verbot (ADR-019) |
+   | Architect | Code      | Ja | .claude/skills/architect/, .claude/commands/architect.md | wie bisher |
+   | Builder   | Desktop   | Nein, aktuell | -- | s. Architect/Desktop |
+   | Builder   | Code      | Ja | .claude/skills/builder/, .claude/commands/builder.md | wie bisher |
+   | Auditor   | Desktop   | Nein, aktuell | -- | s. Architect/Desktop |
+   | Auditor   | Code      | Ja | .claude/skills/auditor/, .claude/commands/auditor.md | wie bisher |
+
+   Keine Änderung an architecture/role-registry.json (weiterhin
+   ausschließlich die vier bestehenden Einträge Architect/Builder/
+   Auditor/Dirigent, append-only, unverändert durch dieses ADR).
+
+2. **Plattformneutraler Text-Trigger für Kickoff/Advisor.** Da für
+   Kickoff und Advisor auf Desktop kein natives Skill-System wie unter
+   .claude/skills/ existiert, gilt ab sofort: erscheint "/kickoff" oder
+   "/advisor" als eigener Chattext und wird kein technischer Command/
+   Skill dafür erkannt, wird trotzdem die entsprechende Definition
+   geladen und das Verhalten gemäß dieser Rolle übernommen -- der Text
+   selbst ist der Einstiegskanal (ADR-019), unabhängig von der
+   Plattform. Verbindlich festgehalten in CLAUDE.md (Vollzug dieser
+   ADR).
+
+3. **module-lifecycle.md, Schritt 0 (Decision Gate).** Ergänzung einer
+   NICHT blockierenden Prüffrage: "Liegt ein Kontext aus einem
+   vorausgegangenen Advisor-/Desktop-Gespräch vor?" -- rein
+   informativ, kein zusätzliches Freigabekriterium; ändert die
+   bestehenden, tatsächlich blockierenden Punkte des Decision Gate
+   nicht.
+
+Status: accepted
+Begründung: Ohne eine Long-Format-Tabelle mit expliziter
+Werte-Legende ließe sich "kein Adapter" nicht von "Rolle auf dieser
+Plattform nicht vorgesehen" unterscheiden -- in einem früheren Entwurf
+(Konsistenzprüfung, Punkt 3) war "Nein, aktuell" bereits uneinheitlich
+zu blankem "Nein" verkürzt worden, was genau als dauerhafte
+Rolleneigenschaft hätte missverstanden werden können. Der
+plattformneutrale Text-Trigger ist nötig, weil Kickoff/Advisor auf
+Desktop laut docs/Projekthandbuch.md, Abschnitt 9 ("Bekannte
+Baustellen"), technisch noch nicht hinterlegt sind. Die zusätzliche
+Decision-Gate-Frage schließt eine Lücke, die die Konsistenzprüfung
+aufgezeigt hat: ohne sie könnte eine Architect-Session eine bereits im
+Advisor auf Desktop geführte Diskussion versehentlich übergehen, ohne
+dass dafür ein neues, blockierendes Kriterium nötig wäre.
+
+Bestätigt am 2026-07-24 durch den Projektverantwortlichen: gleiche
+Grundlage wie bei ADR-019 oben beschrieben (Architect-Auftrag dieser
+Session als förmliche Freigabe, auf ausdrückliche Rückfrage bestätigt).
+Damit gilt ADR-020 ab jetzt als "accepted"; Umsetzung erfolgt in
+derselben Session in architecture/roles/README.md, CLAUDE.md und
+module-lifecycle.md. Kein ADR-021.
+
+Nachbestätigung 2026-07-24 (im mit der ADR-011-Ergänzung vom 2026-07-24
+operationalisierten Muster, dortige Form a: ADR-Nummer selbst genannt
+und eindeutig akzeptiert): Der Projektverantwortliche hat wörtlich
+erklärt: "ADR-020 AKZEPTIERT. Datum: 2026-07-24." Diese Nachbestätigung
+ersetzt die vorstehende ursprüngliche Bestätigung nicht, sondern stellt
+zusätzlich fest, dass die Freigabe von ADR-020 auch der seither
+präzisierten Formanforderung genügt.
+
 ## Status-Semantik für diese Entscheidungen (gilt für alle ADRs oben und künftige)
 
 - **accepted** = verbindliche Architektur, muss umgesetzt werden
 - **proposed** = Entscheidungsvorschlag, darf NICHT als verbindliche Vorgabe implementiert werden — als offenen Punkt behandeln und beim Architect-Lauf klären
 - **rejected** = verworfen, ignorieren
+
+Ergänzung 2026-07-24 (Architect-Auftrag "Governance-Konsolidierung nach
+Audit ADR-019/020" -- Präzisierung, keine neue Statusart, keine neue
+Datei, keine neue Registry):
+
+- **accepted gilt nur gegen einen committeten Repository-Stand.** Der
+  Text "accepted" in einem noch nicht committeten Arbeitsstand einer
+  Session ist für sich allein keine verbindliche Grundlage für eine
+  andere Session. Nutzung erfolgt ausschließlich gegen einen
+  nachvollziehbaren, benannten Commit-Stand -- analog zu ADR-009, das
+  denselben Grundsatz (kein Arbeiten gegen einen sich ändernden,
+  ungepinnten Stand) bereits für das Lesen von architecture/ und
+  modules/<name>/ während eines Architect-Laufs festlegt. Ursprung der
+  zugrundeliegenden Freigaberegel ("wer setzt accepted, in welcher
+  Form"): ADR-011, Freigabe-Hinweis samt dortiger Ergänzung vom
+  2026-07-24.
 
 Ein Builder, der eine "proposed"-Entscheidung stillschweigend umsetzt, handelt außerhalb seines Mandats.

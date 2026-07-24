@@ -10,8 +10,17 @@ zur Aufnahme in die Registry. Kein Schritt wird uebersprungen.
    [ ] Registry-Eintrag der Abhaengigkeiten existiert
    [ ] Manifest-Konflikte geprueft (Registry vs. module-manifest.js, ADR-008)
    [ ] ADRs fuer offene Architekturfragen zu diesem Modul vorhanden
-   Nur wenn alle Punkte erfuellt sind: Architect starten. Sonst baut ihr
-   spaeter ein Modul auf Annahmen, die rueckwirkend widerrufen werden.
+
+   Zusaetzliche, NICHT blockierende Pruepffrage (ADR-020, kein
+   Bestandteil der obigen Punkte, kein zusaetzliches
+   Freigabekriterium): Liegt ein Kontext aus einem vorausgegangenen
+   Advisor-/Desktop-Gespraech vor? Falls ja, sollte der Architect ihn
+   zur Kenntnis nehmen, bevor er beginnt -- das Decision Gate selbst
+   bleibt ausschliesslich durch die Punkte oben bestimmt.
+
+   Nur wenn alle Punkte oben erfuellt sind: Architect starten. Sonst
+   baut ihr spaeter ein Modul auf Annahmen, die rueckwirkend widerrufen
+   werden.
 
 1. Contract DRAFT -- Architect legt modules/<name>/contract.md an oder
    aendert sie (STATUS: DRAFT). Builder darf in diesem Zustand nicht bauen.

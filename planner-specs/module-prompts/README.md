@@ -15,14 +15,20 @@ zeitlicher Reihenfolge:
   vollstaendigen Code aller im Contract genannten Dateien und die
   Abnahmekriterien-Liste als Pruefgrundlage.
 - <name>-registry-confirmation.md: Input fuer eine neue Auditor-Session
-  (Phase 2), erzeugt vom Dirigenten NACH menschlicher Bestaetigung des
-  Auditor-Manifest-Vorschlags (siehe templates/registry-confirmation-
-  prompt.md fuer die Struktur, ADR-011). Enthaelt den bestaetigten
-  Manifest-Inhalt woertlich; diese Datei loest den tatsaechlichen
-  Schreibvorgang von architecture/planner-registry.json aus.
+  (Phase 2), erzeugt von dieser Auditor-Phase-2-Session selbst direkt zu
+  Sessionbeginn NACH menschlicher Bestaetigung des Auditor-Manifest-
+  Vorschlags (siehe templates/registry-confirmation-prompt.md fuer die
+  Struktur; urspruenglich ADR-011, Rollenzuordnung seit ADR-017 auf den
+  Auditor selbst praezisiert -- kein zwischengeschalteter Dirigenten-
+  Schritt mehr, siehe architecture/roles/auditor.md, Phase 2). Enthaelt
+  den bestaetigten Manifest-Inhalt woertlich; diese Datei loest den
+  tatsaechlichen Schreibvorgang von architecture/planner-registry.json
+  aus. Fuer einen reinen Registry-Freeze (module-lifecycle.md Schritt 12,
+  ADR-013/ADR-018) ist der Inhalt auf die Statusaenderung REVIEW ->
+  FROZEN plus frozenAtCommit/frozenDate beschraenkt, kein neuer
+  Manifest-Inhalt.
 
-Aktuell: standards-builder.md liegt vor (Modul 2, Contract FROZEN
-2026-07-23). standards-audit-request.md und standards-registry-
-confirmation.md existieren noch nicht -- werden erst erzeugt, sobald
-der Builder tatsaechlich Code geliefert hat bzw. sobald danach ein
-Manifest bestaetigt wurde.
+Aktuell (Stand 2026-07-24): fuer Modul 2 (Standards) liegen alle drei
+Dateien vor -- standards-builder.md, standards-audit-request.md und
+standards-registry-confirmation.md. Standards ist FROZEN
+(frozenAtCommit 688f1829ad92f64734de20c918abd53d8f165268, ADR-018).

@@ -53,6 +53,61 @@ Pruefung dienen, bevor eine neue Ausnahme eingefuehrt wird. Konkret:
   bestaetigtem Inhalt materialisiert, ohne eigene fachliche Bewertung
   (siehe architecture/roles/auditor.md, architecture/roles/dirigent.md).
 
+## Grundsatz: Vier-Schichten-Modell (ADR-019, verbindlich fuer alle Rollen und Skills)
+
+Vier Begriffe, die nicht vermischt werden duerfen (siehe
+architecture/decisions.md, ADR-019):
+
+- **Rolle** -- Kickoff, Advisor sowie die vier Rollen aus
+  architecture/role-registry.json (Architect, Builder, Auditor,
+  Dirigent). Bleibt plattformneutral: eine Rolle definiert Zweck,
+  Verantwortung, erlaubte/verbotene Taetigkeiten, Ein-/Ausgabeartefakte
+  -- unabhaengig davon, auf welcher Plattform oder ueber welchen Kanal
+  sie aktiviert wird.
+- **Einstiegskanal** -- der Skill/Befehl (z. B. /architect) oder ein
+  plattformneutraler Chattext, der dieselbe Rolle eindeutig benennt.
+  Enthaelt selbst keinen Rolleninhalt, sondern verweist ausschliesslich
+  auf die vollstaendige Rollen-/Skilldatei.
+- **Plattform** -- z. B. Claude Desktop, Claude Code. Ist keine
+  Eigenschaft einer Rolle, sondern die technische Umgebung, in der eine
+  Session laeuft. Dieselbe Rolle kann grundsaetzlich auf mehreren
+  Plattformen existieren.
+- **Adapter-Zuordnung** -- eine eigene, separate Zuordnung (Tripel aus
+  Rolle x Plattform x Einstiegskanal), die festhaelt, ob fuer eine
+  gegebene Rolle auf einer gegebenen Plattform tatsaechlich ein
+  technischer Adapter existiert (Tabelle unten, ADR-020).
+
+Klarstellung: Prompt und Agent sind verwandte, nicht normative Begriffe
+und stellen keine zusaetzlichen Schichten dar.
+
+### Adapter-Zuordnung (ADR-020)
+
+Werte fuer "Adapter vorhanden":
+
+- **Ja** -- ein technischer Einstiegskanal (Skill/Befehl/Text-Trigger)
+  existiert auf dieser Plattform tatsaechlich.
+- **Nein, aktuell** -- kein Adapter vorhanden, aber technisch
+  grundsaetzlich moeglich; ein zeitlicher, jederzeit revidierbarer
+  Zustand, keine Eigenschaft der Rolle.
+- **Nein, dauerhaft** -- fuer diese Rolle/Plattform-Kombination ist
+  bewusst kein Adapter vorgesehen.
+
+| Rolle     | Plattform | Adapter vorhanden | Einstiegskanal | Begruendung |
+|-----------|-----------|--------------------|-----------------|------------|
+| Kickoff   | Desktop   | Ja | plattformneutraler Text-Trigger "/kickoff" (CLAUDE.md) | reiner Statusbericht, plattformneutral nutzbar |
+| Kickoff   | Code      | Ja | .claude/skills/kickoff/, .claude/commands/kickoff.md | wie bisher (ADR-017) |
+| Advisor   | Desktop   | Ja | plattformneutraler Text-Trigger "/advisor" (CLAUDE.md) | reiner Denkraum, schreibt nie -- keine Dopplung, da nur eine Advisor-Instanz existiert |
+| Advisor   | Code      | Ja | .claude/skills/advisor/, .claude/commands/advisor.md | wie bisher (ADR-017) |
+| Architect | Desktop   | Nein, aktuell | -- | kein technischer Adapter auf Desktop vorhanden; zeitlicher Zustand, kein Verbot |
+| Architect | Code      | Ja | .claude/skills/architect/, .claude/commands/architect.md | wie bisher |
+| Builder   | Desktop   | Nein, aktuell | -- | s. Architect/Desktop |
+| Builder   | Code      | Ja | .claude/skills/builder/, .claude/commands/builder.md | wie bisher |
+| Auditor   | Desktop   | Nein, aktuell | -- | s. Architect/Desktop |
+| Auditor   | Code      | Ja | .claude/skills/auditor/, .claude/commands/auditor.md | wie bisher |
+
+Keine Aenderung an architecture/role-registry.json durch ADR-019/020
+(weiterhin ausschliesslich die vier bestehenden Eintraege, append-only).
+
 ## Warum dieser Ordner existiert
 
 Vor Einfuehrung dieser Struktur legte eine einzige, projektweite
@@ -126,30 +181,34 @@ die Confirmation-Datei materialisiert die Auditor-Phase-2-Session selbst
 direkt aus der Bestaetigung des Projektverantwortlichen, ohne
 zwischengeschalteten Rollenwechsel.
 
+Plattformkennzeichnung je Schritt (Adapter-Zuordnung, ADR-020): [Desktop+Code]
+bedeutet Adapter auf beiden Plattformen vorhanden; [Code] bedeutet Adapter
+aktuell nur auf Code vorhanden (Desktop: "Nein, aktuell", kein Verbot).
+
 ```
-/kickoff (Status, nur lesend, keine Rolle)
+/kickoff [Desktop+Code] (Status, nur lesend, keine Rolle)
    |
    v
-/advisor (optional, Diskussion, keine Rolle, schreibt nichts)
+/advisor [Desktop+Code] (optional, Diskussion, keine Rolle, schreibt nichts)
    |
    |  Decision Gate offen / Contract fehlt oder nicht FROZEN
    v
-Architect (Contract aushandeln, FROZEN setzen)
+Architect [Code] (Contract aushandeln, FROZEN setzen)
    |
    |  Builder-Snapshot erzeugt
    v
-Builder (Code erzeugen, "MODUL <n> FERTIG.")
+Builder [Code] (Code erzeugen, "MODUL <n> FERTIG.")
    |
    |  Mensch: Smoke-Test
    v
-Architect (Audit-Request materialisieren)
+Architect [Code] (Audit-Request materialisieren)
    |
    v
-Auditor Phase 1 (pruefen, Manifest-Vorschlag, "AUDIT <NAME> ABGESCHLOSSEN.")
+Auditor Phase 1 [Code] (pruefen, Manifest-Vorschlag, "AUDIT <NAME> ABGESCHLOSSEN.")
    |
    |  Mensch bestaetigt Manifest (Datum + woertlicher Bezug)
    v
-Auditor Phase 2, neue Session (Confirmation-Datei materialisieren UND
+Auditor Phase 2, neue Session [Code] (Confirmation-Datei materialisieren UND
           Registry schreiben, "REGISTRY <NAME> AKTUALISIERT.")
    |
    v

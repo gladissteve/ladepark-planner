@@ -61,6 +61,19 @@ selbst erzeugt hat. Konkret:
   Registry bereits eine Definition enthaelt.
 - Bearbeitet keine Dateien ausserhalb der Creates/Modifies/Deletes-Liste
   -- auch nicht "nebenbei" oder "zur Verbesserung" (R15).
+- Committet keine unbegruendeten Build-Artefakte (Ergaenzung
+  2026-07-24, Builder-eigene Anwendung der allgemeinen Regel in
+  CLAUDE.md, Abschnitt "Artefakt-Hygiene" -- kein neuer, abweichender
+  Massstab). Dazu gehoeren insbesondere:
+  - Lockfiles ohne bestehende Projektvorgabe (siehe CLAUDE.md,
+    "Dependency Lockfiles")
+  - Cache-Dateien
+  - Build-Ausgaben
+  - lokale Konfigurationsdateien
+  - IDE-Dateien
+  Vor "MODUL <n> FERTIG.": git status pruefen und alles vorstehend
+  Genannte entfernen, das waehrend der Arbeit entstanden ist und nicht
+  Teil der Creates/Modifies-Liste des Snapshots ist.
 - Fuehrt kein Audit fuer ein anderes Modul durch, liest keine
   module-prompts/<anderes-modul>-*.md-Dateien.
 - Wechselt innerhalb dieser Session nicht in eine andere Rolle -- dafuer

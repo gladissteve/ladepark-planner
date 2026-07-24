@@ -1,12 +1,18 @@
 # Ladepark Planner — Claude Code Instructions
 
-## Rollenbasierte Sessions (verbindlich, siehe ADR-011)
+## Rollenbasierte Sessions (verbindlich, siehe ADR-011, praezisiert durch ADR-017)
 
-Dieses Repository arbeitet mit vier dauerhaften, streng getrennten
-Rollen: Architect, Builder, Auditor, Dirigent. Jede Rolle hat eine
-eigene, vollstaendig in sich geschlossene Rollendefinition unter
-planner-specs/architecture/roles/. Die verbindliche Liste aller Rollen
-steht in planner-specs/architecture/role-registry.json.
+Dieses Repository arbeitet mit drei dauerhaften, streng getrennten
+Rollen: Architect, Builder, Auditor. Jede Rolle hat eine eigene,
+vollstaendig in sich geschlossene Rollendefinition unter
+planner-specs/architecture/roles/. Die vierte, urspruenglich mit
+ADR-011 eingefuehrte Rolle Dirigent ist seit ADR-017 deprecated (siehe
+planner-specs/architecture/roles/dirigent.md) und nicht mehr Teil des
+Standard-Workflows; ihre frueheren Aufgaben sind auf die rollenneutralen
+Skills /kickoff und /advisor sowie eine erweiterte Auditor-Phase-2-
+Session verteilt (Details: Abschnitt "Session-Start" unten). Die
+verbindliche Liste aller (auch archivierter) Rollen steht in
+planner-specs/architecture/role-registry.json.
 
 Diese Datei (CLAUDE.md) legt selbst KEINE Rolle fest und ist absichtlich
 rollenneutral. Grund: eine feste Rollenzuweisung in dieser projektweiten
@@ -33,6 +39,17 @@ verwendet werden, ohne eine Rolle festzulegen:
   Architekturentscheidung.
 - /advisor -- Architektur-Sparringspartner (Ideen, Alternativen,
   Risiken, Trade-offs), schreibt nie Projektartefakte.
+
+Plattformuebergreifender Text-Trigger (ADR-020, siehe
+planner-specs/architecture/decisions.md und planner-specs/architecture/
+roles/README.md, Abschnitt "Adapter-Zuordnung"): Wenn /kickoff oder
+/advisor als eigener Chattext erscheint und kein technischer Command/
+Skill erkannt wird:
+
+- entsprechende Rollendefinition laden
+- Verhalten gemaess Rolle uebernehmen
+
+Kein eigener Rolleninhalt in CLAUDE.md.
 
 Jede Session, die sich auf eine Rolle festlegt, beginnt mit GENAU einem
 der folgenden Skills bzw. gleichnamigen Befehle:
@@ -116,6 +133,67 @@ Nach abgeschlossenen Änderungen:
 - Änderungen zusammenfassen
 - betroffene Dateien nennen
 - keine Commits ohne ausdrückliche Aufforderung erstellen
+
+## Artefakt-Hygiene (fuer alle Rollen)
+
+Ergaenzung 2026-07-24 (Arbeitsregel, keine Architekturentscheidung,
+keine Aenderung an Rollen oder Registry): Keine automatisch erzeugten
+Build-Artefakte im Repository.
+
+### Dependency Lockfiles
+
+Praezisierung 2026-07-24: Lockfiles sind keine automatisch erzeugten
+Projektartefakte, sondern eine eigene Kategorie mit eigener Regel. Der
+Agent darf keine neuen Lockfiles erzeugen, aendern oder committen,
+ausser:
+
+- das Projekt verwendet dieses Lockfile nachweislich bereits als
+  Bestandteil des Build-Prozesses,
+- die Aenderung ist fuer die Funktionalitaet erforderlich,
+- die Aenderung wird explizit im Auftrag verlangt.
+
+Temporaer durch Paketmanager oder lokale Tests erzeugte Lockfiles sind
+nach der Verwendung zu entfernen.
+
+Beispiele: package-lock.json, yarn.lock, pnpm-lock.yaml, poetry.lock,
+Cargo.lock, uv.lock.
+
+Grundsatz (Ergaenzung 2026-07-24): Lockfiles sind verdaechtig, nicht
+verboten -- keine pauschale Loeschregel, da ein Projekt legitim ein
+Lockfile fuehren kann. Einordnung im Einzelfall:
+
+| Fall | Aktion |
+|---|---|
+| Bestehendes Lockfile im Repo | behalten |
+| Aenderung durch Dependency-Update | pruefen |
+| Neues Lockfile entstanden | loeschen |
+| Build benoetigt Lockfile explizit | behalten und dokumentieren |
+
+Vor jedem Commit:
+- git status pruefen
+- neu entstandene Lockfiles bewerten
+- nicht benoetigte Lockfiles loeschen
+
+Automatisierter Check (Ergaenzung 2026-07-24): `.githooks/pre-commit`
+prueft `git diff --name-only --cached` gegen die Lockfile-Muster oben,
+zeigt bei Treffer die Tabelle und verlangt vor dem Commit eine bewusste
+Bestaetigung ("Lockfile detected. Confirm necessity before commit.");
+in nicht-interaktiven Umgebungen (kein TTY) bricht der Hook sicherheits-
+halber ab, statt zu haengen oder stillschweigend durchzulaufen. Der
+Hook loescht/aendert nichts selbst -- reiner Check, keine Automatik.
+Aktivierung pro Klon (core.hooksPath ist lokale, nicht mitcommittete
+Einstellung): `git config core.hooksPath .githooks`. Bewusstes
+Umgehen im Einzelfall: `git commit --no-verify`.
+
+### Sonstige Build-Artefakte und VCS-interne Dateien
+
+Waehrend der Arbeit temporaer durch Tests, Paketmanager oder andere
+Werkzeuge erzeugte Build-Artefakte (z. B. node_modules/, dist/,
+Cache-Verzeichnisse) sowie interne, nicht versionierte VCS-Dateien wie
+.git/index.lock sind vor Abschluss der Aufgabe zu entfernen -- git
+status ist deshalb nicht nur vor, sondern auch nach Abschluss zu
+pruefen (Ergaenzung zum bestehenden Punkt "Nach abgeschlossenen
+Aenderungen" oben), bevor Aenderungen zusammengefasst werden.
 
 ## Kommunikationsmodus (fuer alle Rollen)
 

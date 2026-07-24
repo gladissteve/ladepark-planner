@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Pre-Commit-Check: Dependency-Lockfiles.
+# Siehe CLAUDE.md, Abschnitt "Artefakt-Hygiene" / "Dependency Lockfiles".
+# Grundsatz: Lockfiles sind verdaechtig, nicht verboten -- dieser Hook
+# loescht/aendert nichts automatisch, er zwingt nur zu einer bewussten
+# Entscheidung vor dem Commit.
+#
+# Aktivierung (einmalig pro Klon, core.hooksPath ist lokale Config,
+# wird nicht mitcommittet):
+#   git config core.hooksPath .githooks
+#
+# Bewusstes Umgehen im Einzelfall: git commit --no-verify
+
+set -euo pipefail
+
+LOCKFILE_PATTERN='(^|/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|poetry\.lock|uv\.lock|Cargo\.lock)$'
+
+staged="$(git diff --name-only --cached || true)"
+lockfiles="$(printf '%s\n' "$staged" | grep -E "$LOCKFILE_PATTERN" || true)"
+
+if [ -z "$lockfiles" ]; then
+  exit 0
+fi
+
+echo ""
+echo "Lockfile detected. Confirm necessity before commit."
+echo ""
+
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  status="$(git diff --name-status --cached -- "$f" | cut -f1)"
+  case "$status" in
+    A) echo "  NEU        $f" ;;
+    M) echo "  GEAENDERT  $f" ;;
+    D) echo "  GELOESCHT  $f" ;;
+    *) echo "  $status  $f" ;;
+  esac
+done <<EOF
+$lockfiles
+EOF
+
+echo ""
+echo "Regel (CLAUDE.md, \"Dependency Lockfiles\"): Lockfiles sind"
+echo "verdaechtig, nicht verboten."
+echo ""
+echo "  Fall                                Aktion"
+echo "  -----------------------------------  ------------------------"
+echo "  Bestehendes Lockfile im Repo         behalten"
+echo "  Aenderung durch Dependency-Update    pruefen"
+echo "  Neues Lockfile entstanden            loeschen"
+echo "  Build benoetigt Lockfile explizit    behalten und dokumentieren"
+echo ""
+
+if [ -t 0 ]; then
+  read -r -p "Trotzdem committen? [y/N] " confirm
+  case "$confirm" in
+    [yY]|[yY][eE][sS])
+      exit 0
+      ;;
+    *)
+      echo "Commit abgebrochen."
+      exit 1
+      ;;
+  esac
+else
+  echo "Nicht-interaktive Umgebung erkannt (kein TTY) -- Commit wird"
+  echo "sicherheitshalber abgebrochen. Manuell im Terminal committen und"
+  echo "dabei bewusst bestaetigen, oder falls die Aenderung tatsaechlich"
+  echo "beabsichtigt ist: git commit --no-verify"
+  exit 1
+fi

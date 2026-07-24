@@ -387,6 +387,7 @@ aber gut zu wissen:
 | `planner-specs/architecture/decisions.md` | Alle Architekturentscheidungen mit Stand (aktuellste Quelle bei Widersprüchen) |
 | `planner-specs/architecture/roles/*.md` | Vollständige Rollendefinitionen (Architect, Builder, Auditor) |
 | `planner-specs/modules/<name>/contract.md` | Vertrag je Modul: was es können soll |
+| `LICENSE` | Softwarelizenz des Quellcodes (AGPLv3) |
 
 ## 11. Checkliste für den Alltag
 
@@ -402,3 +403,21 @@ aber gut zu wissen:
 Im Zweifel gilt: Solange du nicht ausdrücklich einen Auftrag erteilst
 oder eine Rolle startest, ändert sich nichts. Und solange nicht
 committet ist, ist eine Änderung noch nicht endgültig.
+
+## 12. Lizenz und Nutzungsbedingungen
+
+**Softwarelizenz.** Der Quellcode dieses Projekts steht unter der GNU
+Affero General Public License v3.0 (AGPLv3), Copyright 2026 Steve
+Gladis — siehe [`LICENSE`](../LICENSE). Nutzung, Veränderung und
+Weitergabe des Codes sind im Rahmen der AGPLv3 möglich; bei
+abgeleiteten Versionen gelten deren Pflichten (u. a. Offenlegung des
+Quellcodes auch bei Nutzung über ein Netzwerk).
+
+**Projektidentität.** Projektname und Projektidentität werden durch
+die AGPL nicht automatisch mit übertragen. Eine gesonderte
+Marken-/Namensregelung ist davon unabhängig und nicht Gegenstand
+dieses Handbuchs.
+
+**Ausgabeprodukte.** Erzeugt der Planner Pläne, Dokumente oder andere
+Ergebnisse, folgt daraus keine automatische Pflicht zu einer
+bestimmten Kennzeichnung dieser Ergebnisse allein aus der Codelizenz.
